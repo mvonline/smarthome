@@ -153,6 +153,37 @@ Signed-in users can search without this key (uses OAuth).
 4. **Sign in with Google** and accept all requested permissions
 5. Use **Devices**, **Media** (including **Subscriptions**), **Calendar**, **Weather**, **World Clock**, **Markets**, and **Photos** (screen saver)
 
+## GitHub Pages
+
+The repo includes a workflow (`.github/workflows/pages.yml`) that publishes **`smart-home-panel.html` as `index.html`** on every push to **`main`** or **`master`**.
+
+### One-time setup
+
+1. Push this repository to GitHub (if it is not already there).
+2. Open the repo on GitHub → **Settings** → **Pages**.
+3. Under **Build and deployment** → **Source**, choose **GitHub Actions** (not “Deploy from a branch”).
+4. Push a commit to `main` (or run the **Deploy GitHub Pages** workflow manually under **Actions**).
+
+After the workflow succeeds, the site is available at:
+
+| Repo type | URL |
+|-----------|-----|
+| Project site (most common) | `https://<username>.github.io/<repository>/` |
+| User/org site (`<username>.github.io` repo) | `https://<username>.github.io/` |
+
+The workflow adds a **`.nojekyll`** file so GitHub does not run Jekyll on your static HTML.
+
+### Google OAuth on GitHub Pages
+
+Add credentials for the **exact** URL you use in the browser.
+
+- **Authorized JavaScript origins** — origin only (no path), e.g. `https://yourname.github.io`
+- **Authorized redirect URIs** — must match `origin + pathname` when you open the app. Examples for a project site:
+  - `https://yourname.github.io/smarthome/`
+  - Optionally also `https://yourname.github.io/smarthome/index.html` if you ever load that URL directly.
+
+If sign-in fails with `redirect_uri_mismatch`, open **Developer tools → Application** (or the address bar), note the full URL after redirect, and add that exact string under **Authorized redirect URIs**.
+
 ## Tablet / Kiosk Mode
 
 For a wall-mounted tablet or bedside dashboard:
