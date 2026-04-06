@@ -130,11 +130,24 @@ You will see two lists. They are **not** the same thing:
 - Every distinct URL you use to open the app (different host, port, or path) needs a matching **origin** (for JS) and usually a matching **redirect URI** if the pathname differs.
 - You do **not** put the Client Secret in this single-page app for the flows used here; you only copy the **Client ID** into HomePanel.
 
+### “Google hasn’t verified this app” / “Go to … (unsafe)”
+
+This appears because the OAuth client uses **sensitive scopes** (Smart Home, Calendar, YouTube, etc.) and the project has **not** completed Google’s [OAuth app verification](https://support.google.com/cloud/answer/9110914). It is **expected** for personal and homelab apps.
+
+| What to do | When |
+|------------|------|
+| **Continue** | Tap **Advanced** → **Go to … (unsafe)**. The word “unsafe” means Google has not audited the app—not that your code is malicious. Safe if **you** built and host the app. |
+| **Test users** | In [OAuth consent screen](https://console.cloud.google.com/apis/credentials/consent) → **Audience** → **Test users**, add every Google account that should sign in (max 100 while status is **Testing**). Only those accounts can use the app while it stays in Testing. |
+| **Publish without verification** | You can set **Publishing status** to **In production**, but Google may still show warnings or restrict sensitive scopes until you pass verification. |
+| **Full verification** | To remove the warning for **any** user, you must submit the app for verification (privacy policy URL, domain ownership, sometimes a video). Required for a **public** product; usually **not** worth it for a private dashboard. |
+
 ### Step 2 — Device Access Console (one-time $5 fee)
 
 1. Go to [console.nest.google.com/device-access](https://console.nest.google.com/device-access)
 2. Create a project, link your OAuth client ID
-3. Copy the **Project ID**
+3. Copy the **Project ID** (the SDM “enterprise” name — not necessarily the same string as the Google Cloud project ID unless you used the same identifier)
+
+**“Could not load devices” / API 404** — The list-devices URL is `.../enterprises/{Project ID}/devices`. A **404** almost always means the **SDM Project ID** in the panel does not match the Device Access project, or the OAuth client is not linked there. Open the [Device Access Console](https://console.nest.google.com/device-access), copy the **Project ID** exactly, and paste only that string (not `enterprises/...` — the app strips that prefix if present). Sign out, update the field, sign in again.
 
 ### Step 3 — YouTube API key (optional)
 

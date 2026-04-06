@@ -2779,6 +2779,20 @@ function copyOAuthRedirectUri() {
   });
 }
 
+/** SDM list devices uses enterprises/{id}/devices — id only, no "enterprises/" prefix. */
+function normalizeSdmEnterpriseId(raw) {
+  if (raw == null || typeof raw !== 'string') return '';
+  let id = raw.trim();
+  if (id.toLowerCase().startsWith('enterprises/')) {
+    id = id.slice(12);
+  }
+  return id.trim();
+}
+
+function getSdmEnterpriseId() {
+  return normalizeSdmEnterpriseId(CONFIG.PROJECT_ID || '');
+}
+
 // ══════════════════════════════════════════
 //  STATE
 // ══════════════════════════════════════════
@@ -2851,7 +2865,11 @@ function restoreSession() {
     if (session.token && session.expiresAt > Date.now()) {
       accessToken = session.token;
       CONFIG.CLIENT_ID = localStorage.getItem('hp_client_id') || CONFIG.CLIENT_ID;
-      CONFIG.PROJECT_ID = localStorage.getItem('hp_project_id') || CONFIG.PROJECT_ID;
+      const rawPid = localStorage.getItem('hp_project_id') || CONFIG.PROJECT_ID;
+      CONFIG.PROJECT_ID = normalizeSdmEnterpriseId(rawPid);
+      if (rawPid && normalizeSdmEnterpriseId(rawPid) !== String(rawPid).trim()) {
+        localStorage.setItem('hp_project_id', CONFIG.PROJECT_ID);
+      }
       showDashboard();
       loadUserInfo();
       loadDevices();
@@ -2866,7 +2884,9 @@ function restoreSession() {
 
 function startGoogleAuth() {
   const clientId = document.getElementById('client-id-input').value.trim() || CONFIG.CLIENT_ID;
-  const projectId = document.getElementById('project-id-input').value.trim() || CONFIG.PROJECT_ID;
+  const projectId = normalizeSdmEnterpriseId(
+    document.getElementById('project-id-input').value.trim() || CONFIG.PROJECT_ID
+  );
 
   if (!clientId) { showToast('⚠️ Please enter your Client ID'); return; }
   if (!projectId) { showToast('⚠️ Please enter your SDM Project ID'); return; }
@@ -2897,7 +2917,12 @@ function handleOAuthCallback() {
     accessToken = token;
     history.replaceState(null, '', window.location.pathname);
     CONFIG.CLIENT_ID = localStorage.getItem('hp_client_id') || CONFIG.CLIENT_ID;
-    CONFIG.PROJECT_ID = localStorage.getItem('hp_project_id') || CONFIG.PROJECT_ID;
+    CONFIG.PROJECT_ID = normalizeSdmEnterpriseId(
+      localStorage.getItem('hp_project_id') || CONFIG.PROJECT_ID
+    );
+    if (localStorage.getItem('hp_project_id')) {
+      localStorage.setItem('hp_project_id', CONFIG.PROJECT_ID);
+    }
 
     if (localStorage.getItem('hp_remember') === '1') {
       const expiresAt = Date.now() + (expiresIn ? parseInt(expiresIn) * 1000 : 3600000);
@@ -2960,20 +2985,37 @@ function showDashboard() {
 // ══════════════════════════════════════════
 async function loadDevices() {
   if (isDemo) { loadDemoDevices(); return; }
+  const enterpriseId = getSdmEnterpriseId();
+  if (!enterpriseId) {
+    showError('Missing SDM Project ID. Sign out and enter the Device Access Project ID from console.nest.google.com/device-access.');
+    return;
+  }
   showLoadingSkeleton();
 
   try {
-    const r = await fetch(
-      `https://smartdevicemanagement.googleapis.com/v1/enterprises/${CONFIG.PROJECT_ID}/devices`,
-      { headers: { Authorization: 'Bearer ' + accessToken } }
-    );
-    if (!r.ok) throw new Error('API error ' + r.status);
-    const data = await r.json();
+    const url = 'https://smartdevicemanagement.googleapis.com/v1/enterprises/' +
+      encodeURIComponent(enterpriseId) + '/devices';
+    const r = await fetch(url, { headers: { Authorization: 'Bearer ' + accessToken } });
+    const text = await r.text();
+    if (!r.ok) {
+      let detail = '';
+      try {
+        const errBody = JSON.parse(text);
+        detail = (errBody.error && errBody.error.message) ? String(errBody.error.message) : '';
+      } catch (x) {}
+      if (r.status === 404) {
+        showDeviceLoadError404(enterpriseId, detail);
+        return;
+      }
+      showError(detail ? ('API error ' + r.status + ': ' + detail) : ('API error ' + r.status));
+      return;
+    }
+    const data = JSON.parse(text);
     devices = parseSDMDevices(data.devices || []);
     renderAll();
-  } catch(e) {
+  } catch (e) {
     console.error(e);
-    showError(e.message);
+    showError(e.message || String(e));
   }
 }
 
@@ -3776,12 +3818,31 @@ function showLoadingSkeleton() {
     </div>`;
 }
 
+function showDeviceLoadError404(enterpriseId, apiDetail) {
+  const safeId = escapeHtml(enterpriseId);
+  const safeDetail = apiDetail ? escapeHtml(apiDetail) : '';
+  document.getElementById('device-area').innerHTML = `
+    <div class="empty-state">
+      <div class="icon">⚠️</div>
+      <h3>Could not load devices (404)</h3>
+      <p style="max-width:460px;margin:0 auto">No Device Access enterprise named <code style="font-size:13px">${safeId}</code>. Google returns 404 when the ID is wrong or that enterprise is not linked to your account.</p>
+      ${safeDetail ? '<p class="wc-hint" style="max-width:460px;margin:12px auto 0">' + safeDetail + '</p>' : ''}
+      <ul style="text-align:left;max-width:420px;margin:16px auto;font-size:14px;color:var(--muted);line-height:1.55">
+        <li>Open <a href="https://console.nest.google.com/device-access" target="_blank" rel="noopener">Device Access Console</a> and copy the <strong>Project ID</strong> shown there (not the Google Cloud “Project ID” unless they are the same).</li>
+        <li>In that console, ensure your <strong>OAuth client ID</strong> is linked to the Device Access project.</li>
+        <li>Paste only the ID string (e.g. <code>my-project-abc</code>). If you copied <code>enterprises/xyz</code>, use only the part after <code>enterprises/</code>.</li>
+      </ul>
+      <p class="wc-hint" style="max-width:420px;margin:0 auto 16px">Sign out, enter the SDM Project ID on the login screen, sign in again, then refresh.</p>
+      <button class="btn-demo" onclick="loadDemoMode()" style="margin:0 auto;display:block">Try Demo Mode instead</button>
+    </div>`;
+}
+
 function showError(msg) {
   document.getElementById('device-area').innerHTML = `
     <div class="empty-state">
       <div class="icon">⚠️</div>
       <h3>Could not load devices</h3>
-      <p>${msg}</p>
+      <p>${escapeHtml(msg)}</p>
       <button class="btn-demo" onclick="loadDemoMode()" style="margin:0 auto;display:block">Try Demo Mode instead</button>
     </div>`;
 }
