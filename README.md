@@ -122,7 +122,7 @@ You will see two lists. They are **not** the same thing:
 | Field | What to put | Example |
 |--------|--------------|---------|
 | **Authorized JavaScript origins** | The **origin** only: `scheme` + `host` + `port`. **No path**, no trailing slash. This is where your panel’s HTML is served from. | `http://192.168.1.10:8080`, `https://panel.example.com` |
-| **Authorized redirect URIs** | The **exact** URL Google is allowed to send the user back to after login. This app sets `redirect_uri` to `window.location.origin + window.location.pathname` (see `CONFIG.REDIRECT_URI` in `smart-home-panel.html`). | If you open `http://192.168.1.10:8080/`, add **`http://192.168.1.10:8080/`**. If you sometimes open `http://192.168.1.10:8080/index.html`, add that URI **as well** — it must match **character for character**. |
+| **Authorized redirect URIs** | The **exact** URL Google may redirect to. The app uses a **canonical** URI (see `getOAuthRedirectUri()` in `smart-home-panel.html`): same origin, trailing slash for path roots (e.g. GitHub Pages `…/repo/` not `…/repo`), and `/index.html` folded to `/`. | Example: **`https://yourname.github.io/your-repo/`** — include the **trailing slash**. Add **`http://192.168.1.10:8080/`** for local Docker. |
 
 **Tips**
 
@@ -182,7 +182,7 @@ Add credentials for the **exact** URL you use in the browser.
   - `https://yourname.github.io/smarthome/`
   - Optionally also `https://yourname.github.io/smarthome/index.html` if you ever load that URL directly.
 
-If sign-in fails with `redirect_uri_mismatch`, open **Developer tools → Application** (or the address bar), note the full URL after redirect, and add that exact string under **Authorized redirect URIs**.
+If you see **`redirect_uri_mismatch`**: open **Google Cloud Console** → your **Web client** → **Authorized redirect URIs** and add the URI your app actually sends (must match **exactly**, including `/` at the end). After a recent update, the app normalizes to a **trailing slash** on project URLs (e.g. `https://user.github.io/repo/`). In the browser console on the login page you can run **`getOAuthRedirectUri()`** and paste that string into Google Cloud. You can list **several** redirect URIs (local + GitHub + custom domain).
 
 ## Tablet / Kiosk Mode
 

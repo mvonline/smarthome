@@ -13,8 +13,9 @@
      - Create a new project
      - Enable "Smart Device Management API"
      - Create OAuth 2.0 credentials (Web Application)
-     - Add your domain to "Authorized JavaScript origins"
-     - Add your domain to "Authorized redirect URIs"
+     - Add your domain to "Authorized JavaScript origins" (e.g. https://user.github.io — no path)
+     - Add the same redirect URI the app uses (run getOAuthRedirectUri() in the browser console;
+       GitHub Pages project sites usually need a trailing slash, e.g. https://user.github.io/repo/)
      - Copy your Client ID below
 
   2. Go to https://console.nest.google.com/device-access
@@ -2679,9 +2680,27 @@ const CONFIG = {
   CLIENT_ID: '',
   PROJECT_ID: 'newagent-834f0',
   SCOPES: 'https://www.googleapis.com/auth/sdm.service https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/youtube.readonly email profile openid',
-  REDIRECT_URI: window.location.origin + window.location.pathname,
   LIVE_TV_URL: 'https://tv.vafa.one/',
 };
+
+/** Canonical redirect for OAuth (must match Google Cloud "Authorized redirect URIs" exactly). */
+function getOAuthRedirectUri() {
+  try {
+    const u = new URL(window.location.href);
+    u.hash = '';
+    let p = u.pathname;
+    if (p.endsWith('/index.html')) {
+      p = p.slice(0, -10);
+      if (p === '') p = '/';
+    }
+    if (p !== '/' && !p.endsWith('/')) {
+      p += '/';
+    }
+    return u.origin + p;
+  } catch (e) {
+    return window.location.origin + window.location.pathname;
+  }
+}
 
 // ══════════════════════════════════════════
 //  STATE
@@ -2783,7 +2802,7 @@ function startGoogleAuth() {
 
   const params = new URLSearchParams({
     client_id: clientId,
-    redirect_uri: CONFIG.REDIRECT_URI,
+    redirect_uri: getOAuthRedirectUri(),
     response_type: 'token',
     scope: CONFIG.SCOPES,
     prompt: 'select_account',
