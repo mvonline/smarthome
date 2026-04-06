@@ -1,0 +1,8 @@
+services:
+  homepanel:
+    build: .
+    image: homepanel:latest
+    container_name: homepanel
+    ports:
+      - "8088:80"
+    restart: unless-stopped

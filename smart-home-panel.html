@@ -275,6 +275,24 @@
   .btn-refresh.spinning { animation: spin 1s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
+  .btn-wakelock {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 14px;
+    height: 36px;
+    padding: 0 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .btn-wakelock:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-wakelock.active { border-color: var(--accent); color: var(--accent); background: rgba(79,255,176,0.08); }
+  .btn-wakelock .wl-icon { font-size: 16px; line-height: 1; }
+  .btn-wakelock .wl-label { font-size: 11px; font-weight: 500; }
+
   /* ── STATUS BAR ── */
   .status-bar {
     display: flex;
@@ -665,6 +683,96 @@
     margin-top: -8px;
   }
 
+  .modal.modal-camera { max-width: min(560px, 100%); }
+
+  .cam-live-wrap {
+    margin: 0 0 20px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #0a0a0c;
+    border: 1px solid var(--border);
+  }
+
+  .cam-live-video {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
+    background: #000;
+  }
+
+  .cam-live-status {
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+
+  .cam-live-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0 14px 14px;
+  }
+
+  .cam-live-toolbar button {
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .cam-live-toolbar button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .cam-live-toolbar .cam-btn-primary {
+    background: var(--warm);
+    border-color: var(--warm);
+    color: #111;
+    font-weight: 600;
+  }
+
+  .cam-rtsp-box {
+    margin: 0 0 16px;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .cam-rtsp-box textarea {
+    width: 100%;
+    min-height: 64px;
+    margin: 8px 0;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-family: ui-monospace, monospace;
+    font-size: 11px;
+    resize: vertical;
+  }
+
+  .device-card-camera .device-status {
+    font-size: 13px;
+  }
+
+  .modal .modal-toggle-wrap {
+    display: inline-flex;
+    vertical-align: middle;
+    cursor: pointer;
+  }
+
+  .modal .modal-toggle-wrap.on .toggle { background: var(--accent); }
+  .modal .modal-toggle-wrap.on .toggle::after { transform: translateX(18px); }
+
   /* ── THERMOSTAT CONTROLS ── */
   .temp-control {
     display: flex;
@@ -699,12 +807,1520 @@
     text-align: center;
   }
 
+  /* ── MAIN NAVIGATION ── */
+  .main-nav {
+    display: flex;
+    gap: 0;
+    padding: 0 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .main-nav-tab {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 14px 20px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .main-nav-tab:hover { color: var(--text); }
+  .main-nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .nav-playing-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent3);
+    display: none;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  .nav-playing-dot.visible { display: inline-block; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  #devices-view, #media-view, #calendar-view, #weather-view, #world-clock-view, #markets-view, #photos-view, #livetv-view { display: none; }
+  #devices-view.active, #media-view.active, #calendar-view.active, #weather-view.active, #world-clock-view.active, #markets-view.active, #photos-view.active { display: block; }
+
+  /* Live TV — full-height embed */
+  #livetv-view {
+    flex: 1;
+    min-height: 0;
+    flex-direction: column;
+  }
+
+  #livetv-view.active { display: flex; }
+
+  .livetv-toolbar {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, var(--surface2) 0%, var(--surface) 100%);
+  }
+
+  .livetv-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text);
+  }
+
+  .livetv-title span {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-left: 8px;
+  }
+
+  .livetv-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .livetv-frame-wrap {
+    flex: 1;
+    min-height: 320px;
+    position: relative;
+    background: #0a0a0c;
+  }
+
+  .livetv-frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  /* ── MEDIA VIEW ── */
+  .media-container {
+    max-width: 820px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 24px 32px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .media-tabs { display: flex; gap: 6px; }
+
+  .media-tab {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 8px 16px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .media-tab.active {
+    background: var(--accent2);
+    border-color: var(--accent2);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .media-input-row { display: flex; gap: 10px; }
+
+  .media-input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 14px 18px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .media-input:focus { border-color: var(--accent); }
+  .media-input::placeholder { color: var(--muted); }
+
+  .media-btn {
+    background: var(--accent);
+    color: #0d1a10;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 14px 22px;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.15s;
+    white-space: nowrap;
+  }
+
+  .media-btn:hover { opacity: 0.9; }
+  .media-btn:active { transform: scale(0.97); }
+
+  /* Player */
+  .player-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .player-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%;
+    background: #000;
+  }
+
+  .player-wrapper > div,
+  .player-wrapper iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100% !important; height: 100% !important;
+  }
+
+  .player-placeholder {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: var(--muted);
+  }
+
+  .player-placeholder .icon { font-size: 48px; }
+  .player-placeholder p { font-size: 14px; }
+
+  .progress-bar-wrap {
+    padding: 0 22px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 14px;
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    width: 0%;
+    pointer-events: none;
+  }
+
+  .progress-time {
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 36px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .player-controls {
+    padding: 12px 22px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .now-playing-info { flex: 1; min-width: 0; }
+
+  .now-playing-title {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .now-playing-channel {
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .ctrl-btn {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 18px;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .ctrl-btn:hover { background: var(--surface2); color: var(--accent); }
+
+  .ctrl-btn.play-btn {
+    font-size: 22px;
+    width: 46px; height: 46px;
+    background: var(--accent);
+    color: #0d1a10;
+  }
+  .ctrl-btn.play-btn:hover { opacity: 0.85; background: var(--accent); color: #0d1a10; }
+
+  .volume-group { display: flex; align-items: center; gap: 6px; }
+
+  .volume-slider {
+    -webkit-appearance: none;
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(to right, var(--accent) var(--vol, 80%), var(--surface2) var(--vol, 80%));
+    border-radius: 10px;
+    outline: none;
+  }
+
+  .volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  /* Search results */
+  .search-results {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+  }
+
+  .search-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .search-card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.3); border-color: rgba(79,255,176,0.2); }
+
+  .search-card-thumb {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    display: block;
+    background: var(--surface2);
+  }
+
+  .search-card-info { padding: 12px; }
+
+  .search-card-title {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+
+  .search-card-channel { font-size: 11px; color: var(--muted); }
+
+  /* Queue */
+  .queue-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .queue-header {
+    padding: 14px 20px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .queue-clear {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 12px;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .queue-clear:hover { color: var(--accent3); }
+
+  .queue-list { max-height: 260px; overflow-y: auto; }
+  .queue-list::-webkit-scrollbar { width: 4px; }
+  .queue-list::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
+
+  .queue-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .queue-item:hover { background: var(--surface2); }
+  .queue-item.active { background: rgba(79,255,176,0.06); }
+
+  .queue-item-thumb {
+    width: 48px; height: 27px;
+    border-radius: 4px;
+    object-fit: cover;
+    background: var(--surface2);
+    flex-shrink: 0;
+  }
+
+  .queue-item-info { flex: 1; min-width: 0; }
+
+  .queue-item-title {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .queue-item-channel { font-size: 11px; color: var(--muted); }
+
+  .queue-item-playing { color: var(--accent); font-size: 14px; flex-shrink: 0; }
+
+  /* API key config */
+  .yt-api-config {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    color: var(--muted);
+    flex-wrap: wrap;
+  }
+
+  .yt-api-config label { white-space: nowrap; }
+
+  .yt-api-config input {
+    flex: 1;
+    min-width: 160px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace, sans-serif;
+    font-size: 12px;
+    padding: 8px 12px;
+    outline: none;
+  }
+
+  .yt-api-config input:focus { border-color: var(--accent); }
+
+  .media-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+  }
+  .media-empty .icon { font-size: 40px; margin-bottom: 12px; }
+  .media-empty h3 { font-family: 'Syne', sans-serif; font-size: 18px; color: var(--text); margin-bottom: 8px; }
+  .media-empty p { font-size: 13px; line-height: 1.6; max-width: 360px; margin: 0 auto; }
+
+  /* ── CALENDAR VIEW ── */
+  .cal-container {
+    max-width: 820px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 24px 32px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .cal-nav { display: flex; align-items: center; gap: 12px; }
+
+  .cal-nav-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .cal-nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .cal-month-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    min-width: 180px;
+    text-align: center;
+  }
+
+  .cal-today-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 8px 16px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .cal-today-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Mini calendar grid */
+  .cal-grid {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+
+  .cal-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .cal-weekdays span {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 6px 0;
+  }
+
+  .cal-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    color: var(--text);
+  }
+
+  .cal-day:hover { background: var(--surface2); }
+  .cal-day.other-month { color: var(--muted); opacity: 0.4; }
+  .cal-day.today { background: var(--accent); color: #0d1a10; font-weight: 700; }
+  .cal-day.today:hover { opacity: 0.85; }
+  .cal-day.selected { background: var(--accent2); color: #fff; font-weight: 600; }
+  .cal-day.selected.today { background: var(--accent); color: #0d1a10; }
+
+  .cal-day .event-dots {
+    display: flex;
+    gap: 3px;
+    position: absolute;
+    bottom: 4px;
+  }
+
+  .cal-day .event-dots span {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--accent2);
+  }
+
+  .cal-day.today .event-dots span { background: #0d1a10; }
+
+  /* Agenda / Events list */
+  .cal-agenda {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .cal-agenda-header {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .cal-agenda-header .day-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .cal-event {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    transition: all 0.15s;
+    border-left: 3px solid var(--accent2);
+  }
+
+  .cal-event:hover { border-color: rgba(123,97,255,0.3); border-left-color: var(--accent2); }
+
+  .cal-event.color-1 { border-left-color: var(--accent); }
+  .cal-event.color-2 { border-left-color: var(--accent2); }
+  .cal-event.color-3 { border-left-color: var(--warm); }
+  .cal-event.color-4 { border-left-color: var(--accent3); }
+  .cal-event.color-5 { border-left-color: #4fc3f7; }
+
+  .cal-event-time {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    min-width: 58px;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+
+  .cal-event-body { flex: 1; min-width: 0; }
+
+  .cal-event-title {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  .cal-event-meta {
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .cal-event-allday {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 20px;
+    border-left: 3px solid var(--accent);
+  }
+
+  .cal-event-allday .cal-event-title {
+    font-size: 13px;
+    margin: 0;
+  }
+
+  .cal-no-events {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .cal-no-events .icon { font-size: 36px; margin-bottom: 10px; }
+
+  /* ── WEATHER VIEW ── */
+  .wx-container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 24px 32px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .wx-search-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .wx-search-row .media-input { flex: 1; min-width: 200px; }
+
+  .wx-loc-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .wx-btn-secondary {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .wx-btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  .wx-hero {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(145deg, var(--surface) 0%, var(--surface2) 55%, rgba(79, 255, 176, 0.06) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    animation: wxHeroIn 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .wx-hero::after {
+    content: '';
+    position: absolute;
+    inset: -40% -20%;
+    background: radial-gradient(ellipse at 30% 20%, rgba(79, 255, 176, 0.12) 0%, transparent 55%);
+    pointer-events: none;
+    animation: wxHeroGlow 12s ease-in-out infinite alternate;
+  }
+
+  .wx-hero-main { display: flex; align-items: center; gap: 20px; position: relative; z-index: 1; }
+
+  .wx-emoji {
+    font-size: 64px;
+    line-height: 1;
+    display: inline-block;
+    animation: wxEmojiFloat 5s ease-in-out infinite;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.25));
+  }
+
+  @keyframes wxHeroIn {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes wxHeroGlow {
+    0% { opacity: 0.5; transform: translate(0, 0) rotate(0deg); }
+    100% { opacity: 1; transform: translate(4%, 2%) rotate(2deg); }
+  }
+
+  @keyframes wxEmojiFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .wx-section-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin: 8px 0 4px;
+  }
+
+  .wx-hourly-wrap {
+    position: relative;
+  }
+
+  .wx-hourly {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 8px 4px 16px;
+    margin: 0 -4px;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .wx-hourly::-webkit-scrollbar { height: 6px; }
+  .wx-hourly::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+  }
+
+  .wx-hour-slot {
+    flex: 0 0 auto;
+    width: 76px;
+    scroll-snap-align: start;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 8px;
+    text-align: center;
+    transition: border-color 0.2s, transform 0.2s;
+    animation: wxSlotIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--wx-i, 0) * 0.035s);
+  }
+
+  .wx-hour-slot:hover {
+    border-color: rgba(79, 255, 176, 0.25);
+    transform: translateY(-2px);
+  }
+
+  .wx-hour-slot.wx-hour-now {
+    border-color: rgba(79, 255, 176, 0.45);
+    background: linear-gradient(180deg, rgba(79, 255, 176, 0.1) 0%, var(--surface) 100%);
+  }
+
+  .wx-hour-time {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .wx-hour-slot.wx-hour-now .wx-hour-time { color: var(--accent); }
+
+  .wx-hour-emoji { font-size: 26px; line-height: 1; margin-bottom: 6px; }
+
+  .wx-hour-temp {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  .wx-hour-pop {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 4px;
+    opacity: 0.85;
+  }
+
+  @keyframes wxSlotIn {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .wx-daily .wx-day {
+    animation: wxSlotIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--wx-d, 0) * 0.05s + 0.15s);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .wx-hero,
+    .wx-hero::after,
+    .wx-emoji,
+    .wx-hour-slot,
+    .wx-daily .wx-day {
+      animation: none !important;
+      transition: none;
+    }
+    .wx-hero::after { opacity: 0.6; }
+  }
+
+  .wx-temp-block { display: flex; flex-direction: column; gap: 4px; position: relative; z-index: 1; }
+
+  .wx-temp {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 48px;
+    letter-spacing: -2px;
+    line-height: 1;
+  }
+
+  .wx-feels { font-size: 14px; color: var(--muted); }
+
+  .wx-location {
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  .wx-meta {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .wx-meta span { display: flex; align-items: center; gap: 8px; }
+
+  .wx-daily {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+  }
+
+  .wx-day {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 10px;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+
+  .wx-day:hover { border-color: rgba(79,255,176,0.2); }
+
+  .wx-day-name { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+
+  .wx-day-emoji { font-size: 28px; margin-bottom: 8px; }
+
+  .wx-day-hi { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; }
+
+  .wx-day-lo { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  .wx-loading, .wx-error {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--muted);
+  }
+
+  .wx-error { color: var(--accent3); }
+
+  .media-input-row.hidden { display: none; }
+
+  /* ── WORLD CLOCK ── */
+  .wc-container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 32px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .wc-intro {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .wc-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(22px, 4vw, 28px);
+    letter-spacing: -0.03em;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .wc-sub {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin: 0;
+    max-width: 52ch;
+  }
+
+  .wc-panel {
+    background: linear-gradient(165deg, var(--surface) 0%, var(--surface2) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .wc-add-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .wc-add-row .media-input { flex: 1; min-width: 200px; }
+
+  .wc-section-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin: 0 0 2px;
+  }
+
+  .wc-chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .wc-quick-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 16px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, background 0.2s, transform 0.15s;
+  }
+
+  .wc-quick-btn:hover {
+    border-color: rgba(79, 255, 176, 0.45);
+    color: var(--accent);
+    background: rgba(79, 255, 176, 0.06);
+  }
+
+  .wc-quick-btn:active { transform: scale(0.97); }
+
+  .wc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .wc-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius);
+    padding: 0;
+    border: 1px solid var(--border);
+    background: linear-gradient(155deg, var(--surface) 0%, rgba(20, 22, 28, 0.98) 100%);
+    transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
+    animation: wcCardIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--wc-i, 0) * 0.07s);
+  }
+
+  .wc-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(79, 255, 176, 0.35), transparent);
+    opacity: 0.5;
+  }
+
+  .wc-card.local {
+    border-color: rgba(79, 255, 176, 0.35);
+    box-shadow: 0 0 0 1px rgba(79, 255, 176, 0.08), 0 12px 40px rgba(0, 0, 0, 0.35);
+  }
+
+  .wc-card.local::before {
+    opacity: 1;
+    background: linear-gradient(90deg, rgba(79, 255, 176, 0.2), rgba(79, 255, 176, 0.6), rgba(79, 255, 176, 0.2));
+  }
+
+  .wc-card:hover {
+    border-color: rgba(79, 255, 176, 0.22);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .wc-card-inner {
+    padding: 22px 22px 20px;
+    position: relative;
+  }
+
+  .wc-card-glow {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    top: -80px;
+    right: -60px;
+    background: radial-gradient(circle, rgba(79, 255, 176, 0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .wc-pill {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 100px;
+    background: rgba(79, 255, 176, 0.12);
+    color: var(--accent);
+    border: 1px solid rgba(79, 255, 176, 0.25);
+    margin-bottom: 14px;
+  }
+
+  .wc-card:not(.local) .wc-pill {
+    background: var(--surface2);
+    color: var(--muted);
+    border-color: var(--border);
+  }
+
+  .wc-remove {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 2;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+
+  .wc-remove:hover {
+    background: rgba(255, 80, 80, 0.15);
+    border-color: rgba(255, 80, 80, 0.35);
+    color: #ff9090;
+  }
+
+  .wc-head {
+    padding-right: 40px;
+    margin-bottom: 18px;
+  }
+
+  .wc-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    margin: 0 0 6px;
+  }
+
+  .wc-tz {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'DM Mono', ui-monospace, monospace;
+    letter-spacing: 0.02em;
+    opacity: 0.9;
+    word-break: break-all;
+  }
+
+  .wc-time-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 10px;
+    margin-bottom: 4px;
+  }
+
+  .wc-time {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(32px, 5vw, 42px);
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .wc-time-hm {
+    color: var(--accent);
+    text-shadow: 0 0 40px rgba(79, 255, 176, 0.15);
+  }
+
+  .wc-time-sec {
+    font-size: 0.55em;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0;
+  }
+
+  .wc-time-ampm {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    align-self: center;
+  }
+
+  .wc-date-block {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .wc-date-wd {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .wc-date-rest {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .wc-hint {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  @keyframes wcCardIn {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .wc-card { animation: none; }
+    .wc-card:hover { transform: none; }
+  }
+
+  /* ── MARKETS (crypto + stocks) ── */
+  .mk-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px 32px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .mk-panel { display: none; }
+  .mk-panel.active { display: block; }
+
+  .mk-search-wrap { position: relative; }
+
+  .mk-search-results {
+    position: absolute;
+    left: 0; right: 0;
+    top: 100%;
+    margin-top: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 50;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+  }
+
+  .mk-search-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  .mk-search-item:last-child { border-bottom: none; }
+  .mk-search-item:hover { background: var(--surface); }
+
+  .mk-search-item span { color: var(--muted); font-size: 11px; text-transform: uppercase; }
+
+  .mk-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+  }
+
+  .mk-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 16px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+
+  .mk-card:hover { border-color: rgba(79,255,176,0.12); }
+
+  .mk-remove {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+    opacity: 0.65;
+  }
+
+  .mk-remove:hover { opacity: 1; color: var(--accent3); }
+
+  .mk-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    padding-right: 22px;
+    margin-bottom: 2px;
+  }
+
+  .mk-symbol {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .mk-price {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 26px;
+    letter-spacing: -0.5px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .mk-change {
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .mk-change.up { color: var(--accent); }
+  .mk-change.down { color: var(--accent3); }
+
+  .mk-meta {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  .mk-footer-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  /* ── PHOTOS + SCREENSAVER ── */
+  .ph-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px 32px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .ph-settings {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 24px;
+    align-items: center;
+  }
+
+  .ph-settings label { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+
+  .ph-settings select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+
+  .ph-drop {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 32px 24px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .ph-drop:hover { border-color: var(--accent); background: rgba(79,255,176,0.04); }
+
+  .ph-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+
+  .ph-thumb {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .ph-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ph-thumb button {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .ph-thumb button:hover { background: var(--accent3); }
+
+  /* Fullscreen screensaver */
+  #screensaver-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: #000;
+    cursor: pointer;
+  }
+
+  #screensaver-overlay.ss-visible { display: block; }
+
+  .ss-img-wrap {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+  }
+
+  #ss-main-img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+  }
+
+  #ss-main-img.ss-opaque { opacity: 1; }
+
+  .ss-ui {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 24px 32px 32px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.75));
+    pointer-events: none;
+  }
+
+  .ss-clock {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(32px, 8vw, 56px);
+    color: #fff;
+    text-shadow: 0 2px 24px rgba(0,0,0,0.5);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ss-hint {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    margin-top: 8px;
+  }
+
   @media (max-width: 600px) {
     .topbar { padding: 24px 20px 0; }
+    .main-nav { padding: 0 20px; }
     .status-bar, .room-tabs { padding-left: 20px; padding-right: 20px; }
     .device-grid, .loading-grid { padding: 20px; gap: 12px; }
     .device-grid { grid-template-columns: 1fr 1fr; }
     .topbar-left h1 { font-size: 22px; }
+    .media-container { padding: 20px; }
+    .search-results { grid-template-columns: 1fr 1fr; }
+    .player-controls { flex-wrap: wrap; }
+    .volume-group { width: 100%; justify-content: center; }
+    .cal-container { padding: 20px; }
+    .cal-month-title { font-size: 16px; min-width: 140px; }
+    .cal-event { flex-direction: column; gap: 6px; }
+    .cal-event-time { min-width: unset; }
+    .wx-container { padding: 20px; }
+    .wx-emoji { font-size: 48px; }
+    .wx-temp { font-size: 36px; }
+    .wc-container { padding: 20px; }
+    .wc-time { font-size: clamp(26px, 7vw, 34px); }
+    .mk-container { padding: 20px; }
+    .mk-price { font-size: 22px; }
+    .ph-container { padding: 20px; }
   }
 </style>
 </head>
@@ -750,23 +2366,300 @@
       <div class="greeting" id="user-email">Loading...</div>
     </div>
     <div class="topbar-right">
+      <button class="btn-wakelock" id="wakelock-btn" onclick="toggleWakeLock()" title="Keep screen awake">
+        <span class="wl-icon" id="wl-icon">☀️</span>
+        <span class="wl-label" id="wl-label">Stay on</span>
+      </button>
       <button class="btn-refresh" id="refresh-btn" onclick="refreshDevices()" title="Refresh">↻</button>
       <div class="user-avatar-placeholder" id="user-avatar">👤</div>
       <button class="btn-signout" onclick="signOut()">Sign out</button>
     </div>
   </div>
 
-  <div class="status-bar" id="status-bar">
-    <div class="stat-pill"><div class="dot"></div><span id="stat-online">0 devices online</span></div>
-    <div class="stat-pill"><div class="dot warn"></div><span id="stat-time">--:--</span></div>
-    <div class="stat-pill">🌡️ <span id="stat-temp">--°</span></div>
+  <div class="main-nav">
+    <button class="main-nav-tab active" data-tab="devices" onclick="switchMainTab('devices', this)">🏠 Devices</button>
+    <button class="main-nav-tab" data-tab="media" onclick="switchMainTab('media', this)">🎵 Media <span class="nav-playing-dot" id="nav-playing-dot"></span></button>
+    <button class="main-nav-tab" data-tab="calendar" onclick="switchMainTab('calendar', this)">📅 Calendar</button>
+    <button class="main-nav-tab" data-tab="weather" onclick="switchMainTab('weather', this)">🌤️ Weather</button>
+    <button class="main-nav-tab" data-tab="worldclock" onclick="switchMainTab('worldclock', this)">🕐 World Clock</button>
+    <button class="main-nav-tab" data-tab="markets" onclick="switchMainTab('markets', this)">📈 Markets</button>
+    <button class="main-nav-tab" data-tab="photos" onclick="switchMainTab('photos', this)">🖼️ Photos</button>
+    <button class="main-nav-tab" data-tab="livetv" onclick="switchMainTab('livetv', this)">📺 Live TV</button>
   </div>
 
-  <div class="room-tabs" id="room-tabs">
-    <button class="room-tab active" data-room="all" onclick="filterRoom('all', this)">All Rooms</button>
+  <!-- ── Devices View ── -->
+  <div id="devices-view" class="active">
+    <div class="status-bar" id="status-bar">
+      <div class="stat-pill"><div class="dot"></div><span id="stat-online">0 devices online</span></div>
+      <div class="stat-pill"><div class="dot warn"></div><span id="stat-time">--:--</span></div>
+      <div class="stat-pill">🌡️ <span id="stat-temp">--°</span></div>
+    </div>
+
+    <div class="room-tabs" id="room-tabs">
+      <button class="room-tab active" data-room="all" onclick="filterRoom('all', this)">All Rooms</button>
+    </div>
+
+    <div id="device-area"></div>
   </div>
 
-  <div id="device-area"></div>
+  <!-- ── Media View ── -->
+  <div id="media-view">
+    <div class="media-container">
+      <div class="media-tabs">
+        <button class="media-tab active" data-src="youtube" onclick="switchMediaTab('youtube', this)">▶ YouTube</button>
+        <button class="media-tab" data-src="music" onclick="switchMediaTab('music', this)">♫ YouTube Music</button>
+        <button class="media-tab" data-src="subscriptions" onclick="switchMediaTab('subscriptions', this)">📺 Subscriptions</button>
+      </div>
+
+      <div class="media-input-row" id="media-input-row">
+        <input class="media-input" id="media-url-input" type="text"
+          placeholder="Paste a YouTube URL or search..."
+          onkeydown="if(event.key==='Enter')handleMediaInput()">
+        <button class="media-btn" id="media-play-btn" onclick="handleMediaInput()">Play</button>
+      </div>
+
+      <div class="player-section" id="player-section">
+        <div class="player-wrapper">
+          <div id="yt-player-container">
+            <div class="player-placeholder" id="player-placeholder">
+              <div class="icon">🎬</div>
+              <p>Paste a URL or search to start playing</p>
+            </div>
+          </div>
+        </div>
+        <div class="progress-bar-wrap">
+          <span class="progress-time" id="time-current">0:00</span>
+          <div class="progress-bar" onclick="seekTo(event)">
+            <div class="progress-bar-fill" id="progress-fill"></div>
+          </div>
+          <span class="progress-time" id="time-duration">0:00</span>
+        </div>
+        <div class="player-controls">
+          <button class="ctrl-btn" onclick="playPrev()" title="Previous">⏮</button>
+          <button class="ctrl-btn play-btn" id="play-pause-btn" onclick="togglePlayPause()" title="Play/Pause">▶</button>
+          <button class="ctrl-btn" onclick="playNext()" title="Next">⏭</button>
+          <div class="now-playing-info">
+            <div class="now-playing-title" id="now-playing-title">Nothing playing</div>
+            <div class="now-playing-channel" id="now-playing-channel"></div>
+          </div>
+          <div class="volume-group">
+            <span style="font-size:14px;color:var(--muted)">🔊</span>
+            <input type="range" class="volume-slider" id="volume-slider" min="0" max="100" value="80"
+              style="--vol:80%"
+              oninput="setVolume(this.value)">
+          </div>
+        </div>
+      </div>
+
+      <div id="search-results-area"></div>
+
+      <div class="queue-section" id="queue-section" style="display:none">
+        <div class="queue-header">
+          <span>Up Next</span>
+          <button class="queue-clear" onclick="clearQueue()">Clear</button>
+        </div>
+        <div class="queue-list" id="queue-list"></div>
+      </div>
+
+      <div class="yt-api-config">
+        <label>🔑 YouTube API Key (for search):</label>
+        <input type="text" id="yt-api-key-input" placeholder="Optional — enables search"
+          onchange="saveYTApiKey(this.value)">
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Calendar View ── -->
+  <div id="calendar-view">
+    <div class="cal-container">
+      <div class="cal-header">
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="calNavigate(-1)">◂</button>
+          <div class="cal-month-title" id="cal-month-title"></div>
+          <button class="cal-nav-btn" onclick="calNavigate(1)">▸</button>
+        </div>
+        <button class="cal-today-btn" onclick="calGoToday()">Today</button>
+      </div>
+
+      <div class="cal-grid">
+        <div class="cal-weekdays">
+          <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+        </div>
+        <div class="cal-days" id="cal-days"></div>
+      </div>
+
+      <div id="cal-agenda-area">
+        <div class="cal-no-events">
+          <div class="icon">📅</div>
+          <p>Select a day to view events</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Weather View ── -->
+  <div id="weather-view">
+    <div class="wx-container">
+      <div class="wx-search-row">
+        <input class="media-input" id="wx-city-input" type="text" placeholder="Search city (e.g. London, Tokyo)..."
+          onkeydown="if(event.key==='Enter')searchWeatherCity()">
+        <button class="media-btn" onclick="searchWeatherCity()">Search</button>
+      </div>
+      <div class="wx-loc-btns">
+        <button class="wx-btn-secondary" onclick="useWeatherGeolocation()">📍 Use my location</button>
+        <button class="wx-btn-secondary" onclick="loadWeather()">↻ Refresh</button>
+      </div>
+      <div id="wx-content-area">
+        <div class="wx-loading">Loading weather…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── World Clock View ── -->
+  <div id="world-clock-view">
+    <div class="wc-container">
+      <header class="wc-intro">
+        <h2 class="wc-title">World clock</h2>
+        <p class="wc-sub">Live times for your places. Updates every second while this tab is open. Cities are resolved with Open-Meteo; your list stays on this device.</p>
+      </header>
+
+      <div class="wc-panel">
+        <div class="wc-add-row">
+          <input class="media-input" id="wc-city-input" type="text" placeholder="Search a city (e.g. Paris, Sydney, Dubai)…"
+            onkeydown="if(event.key==='Enter')addWorldClockCity()">
+          <button class="media-btn" onclick="addWorldClockCity()">Add city</button>
+        </div>
+        <p class="wc-hint">Tip: use quick-add chips for common zones, or search any city name.</p>
+        <div>
+          <div class="wc-section-label">Quick add</div>
+          <div class="wc-chips">
+            <button type="button" class="wc-quick-btn" onclick="addWorldClockPreset('UTC','UTC')">UTC</button>
+            <button type="button" class="wc-quick-btn" onclick="addWorldClockPreset('America/New_York','New York')">New York</button>
+            <button type="button" class="wc-quick-btn" onclick="addWorldClockPreset('Europe/London','London')">London</button>
+            <button type="button" class="wc-quick-btn" onclick="addWorldClockPreset('Europe/Paris','Paris')">Paris</button>
+            <button type="button" class="wc-quick-btn" onclick="addWorldClockPreset('Asia/Tokyo','Tokyo')">Tokyo</button>
+            <button type="button" class="wc-quick-btn" onclick="addWorldClockPreset('Asia/Dubai','Dubai')">Dubai</button>
+            <button type="button" class="wc-quick-btn" onclick="addWorldClockPreset('Australia/Sydney','Sydney')">Sydney</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="wc-grid" id="wc-grid"></div>
+    </div>
+  </div>
+
+  <!-- ── Markets View ── -->
+  <div id="markets-view">
+    <div class="mk-container">
+      <div class="media-tabs">
+        <button type="button" class="media-tab active" id="mk-tab-crypto" onclick="switchMarketTab('crypto', this)">₿ Crypto</button>
+        <button type="button" class="media-tab" id="mk-tab-stocks" onclick="switchMarketTab('stocks', this)">📊 Stocks</button>
+      </div>
+
+      <div class="mk-panel active" id="mk-crypto-panel">
+        <div class="wc-add-row">
+          <div class="mk-search-wrap" style="flex:1;min-width:200px">
+            <input class="media-input" id="mk-crypto-search" type="text" placeholder="Search coin to add (e.g. bitcoin, sol, cardano)..."
+              onkeydown="if(event.key==='Enter')searchCryptoAdd()">
+            <div class="mk-search-results" id="mk-crypto-dropdown" style="display:none"></div>
+          </div>
+          <button type="button" class="media-btn" onclick="searchCryptoAdd()">Search</button>
+        </div>
+        <p class="wc-hint">Prices from CoinGecko (no API key). Updates every 60s while this tab is open.</p>
+        <div class="mk-grid" id="mk-crypto-grid"></div>
+      </div>
+
+      <div class="mk-panel" id="mk-stocks-panel">
+        <div class="yt-api-config">
+          <label>Finnhub API key (free at finnhub.io):</label>
+          <input type="text" id="finnhub-key-input" placeholder="Required for US stock quotes"
+            onchange="saveFinnhubKey(this.value)">
+        </div>
+        <div class="wc-add-row">
+          <input class="media-input" id="mk-stock-input" type="text" placeholder="Ticker symbol e.g. AAPL, MSFT, GOOGL..."
+            onkeydown="if(event.key==='Enter')addStockSymbol()">
+          <button type="button" class="media-btn" onclick="addStockSymbol()">Add</button>
+        </div>
+        <p class="wc-hint">US symbols work best. Quotes update every 60s while this tab is open.</p>
+        <div class="mk-grid" id="mk-stocks-grid"></div>
+      </div>
+
+      <div class="mk-footer-actions">
+        <button type="button" class="wx-btn-secondary" onclick="refreshMarkets()">↻ Refresh now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Photos & Screen Saver ── -->
+  <div id="photos-view">
+    <div class="ph-container">
+      <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700">Photo screen saver</h2>
+      <p class="wc-hint">Add images below. After the panel is idle for a while, they display full screen like a screen saver. Tap the screen to return.</p>
+
+      <div class="ph-settings">
+        <label>
+          <input type="checkbox" id="ss-enabled" checked onchange="saveScreensaverSettings()">
+          Enable screen saver
+        </label>
+        <label>
+          Start after
+          <select id="ss-idle-min" onchange="saveScreensaverSettings()">
+            <option value="1">1 min</option>
+            <option value="3">3 min</option>
+            <option value="5" selected>5 min</option>
+            <option value="10">10 min</option>
+            <option value="15">15 min</option>
+            <option value="30">30 min</option>
+          </select>
+        </label>
+        <label>
+          Slide every
+          <select id="ss-slide-sec" onchange="saveScreensaverSettings()">
+            <option value="8">8 sec</option>
+            <option value="12" selected>12 sec</option>
+            <option value="20">20 sec</option>
+            <option value="30">30 sec</option>
+          </select>
+        </label>
+        <button type="button" class="wx-btn-secondary" onclick="testScreensaver()">Preview screen saver</button>
+      </div>
+
+      <input type="file" id="ph-file-input" accept="image/*" multiple style="display:none" onchange="handlePhotoFiles(this.files)">
+
+      <div class="ph-drop" onclick="document.getElementById('ph-file-input').click()">
+        <div style="font-size:36px;margin-bottom:8px">📷</div>
+        Tap to add photos (stored on this device only)
+      </div>
+
+      <div class="ph-grid" id="ph-grid"></div>
+    </div>
+  </div>
+
+  <!-- ── Live TV (embedded site) ── -->
+  <div id="livetv-view">
+    <div class="livetv-toolbar">
+      <div class="livetv-title">Live TV <span>tv.vafa.one</span></div>
+      <div class="livetv-actions">
+        <a class="wx-btn-secondary" href="https://tv.vafa.one/" target="_blank" rel="noopener noreferrer">Open in new tab</a>
+        <button type="button" class="wx-btn-secondary" onclick="reloadLiveTvFrame()">↻ Reload</button>
+      </div>
+    </div>
+    <div class="livetv-frame-wrap">
+      <iframe id="livetv-iframe" class="livetv-frame" src="about:blank" title="Live TV (tv.vafa.one)"
+        allowfullscreen
+        allow="autoplay; fullscreen; encrypted-media; picture-in-picture; display-capture"></iframe>
+    </div>
+  </div>
+</div>
+
+<div id="screensaver-overlay" onclick="stopScreensaver(event)">
+  <div class="ss-img-wrap">
+    <img id="ss-main-img" alt="" draggable="false">
+  </div>
+  <div class="ss-ui">
+    <div class="ss-clock" id="ss-clock">--:--</div>
+    <div class="ss-hint">Tap anywhere to exit</div>
+  </div>
 </div>
 
 <div id="toast"></div>
@@ -785,8 +2678,9 @@
 const CONFIG = {
   CLIENT_ID: '',
   PROJECT_ID: '',
-  SCOPES: 'https://www.googleapis.com/auth/sdm.service email profile openid',
+  SCOPES: 'https://www.googleapis.com/auth/sdm.service https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/youtube.readonly email profile openid',
   REDIRECT_URI: window.location.origin + window.location.pathname,
+  LIVE_TV_URL: 'https://tv.vafa.one/',
 };
 
 // ══════════════════════════════════════════
@@ -796,6 +2690,13 @@ let accessToken = null;
 let devices = [];
 let currentRoom = 'all';
 let isDemo = false;
+
+let _modalCameraId = null;
+let _camPc = null;
+let _camMediaSessionId = null;
+let _camExtendTimer = null;
+let _camDeviceId = null;
+let _camRtspExtensionToken = null;
 
 // ══════════════════════════════════════════
 //  GREETING
@@ -922,6 +2823,9 @@ function signOut() {
   isDemo = false;
   devices = [];
   clearSession();
+  stopScreensaver();
+  stopCameraLive();
+  _modalCameraId = null;
   document.getElementById('auth-screen').style.display = 'flex';
   document.getElementById('dashboard').style.display = 'none';
   showToast('👋 Signed out');
@@ -952,6 +2856,7 @@ function showDashboard() {
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('dashboard').style.display = 'flex';
   document.getElementById('dashboard').style.flexDirection = 'column';
+  initScreensaverIdle();
 }
 
 // ══════════════════════════════════════════
@@ -989,6 +2894,7 @@ function parseSDMDevices(raw) {
     const mode = traits['sdm.devices.traits.ThermostatMode'] || {};
     const humidity = traits['sdm.devices.traits.Humidity'] || {};
     const colorSetting = traits['sdm.devices.traits.ColorSetting'] || null;
+    const camLive = traits['sdm.devices.traits.CameraLiveStream'] || null;
 
     let colorHsv = null;
     if (colorSetting) {
@@ -1030,6 +2936,12 @@ function parseSDMDevices(raw) {
       hvacStatus: hvac.status || '',
       thermostatMode: mode.mode || '',
       humidity: humidity.ambientHumidityPercent || null,
+      cameraLiveStream: camLive
+        ? {
+            supportedProtocols: camLive.supportedProtocols || [],
+            maxVideoResolution: camLive.maxVideoResolution || null,
+          }
+        : null,
       raw: d,
     };
   });
@@ -1072,6 +2984,40 @@ async function executeCommand(deviceId, command, params) {
     setTimeout(loadDevices, 1200);
   } catch(e) {
     showToast('✗ ' + e.message);
+  }
+}
+
+async function executeCommandWithResult(deviceId, command, params) {
+  if (isDemo) {
+    return { ok: false, error: 'Not available in demo mode' };
+  }
+  try {
+    const r = await fetch(
+      `https://smartdevicemanagement.googleapis.com/v1/${deviceId}:executeCommand`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer ' + accessToken,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ command, params: params || {} }),
+      }
+    );
+    const text = await r.text();
+    let data = {};
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch (x) {
+      data = { raw: text };
+    }
+    if (!r.ok) {
+      const err = data.error || {};
+      const msg = err.message || err.status || `HTTP ${r.status}`;
+      return { ok: false, error: msg, data };
+    }
+    return { ok: true, data };
+  } catch (e) {
+    return { ok: false, error: e.message || String(e) };
   }
 }
 
@@ -1141,6 +3087,7 @@ function deviceIcon(kind) {
 function deviceCard(d) {
   if (d.kind === 'thermostat') return thermostatCard(d);
   if (d.kind === 'light') return lightCard(d);
+  if (d.kind === 'camera' || d.kind === 'doorbell') return cameraCard(d);
   return switchCard(d);
 }
 
@@ -1192,6 +3139,24 @@ function thermostatCard(d) {
       <div class="thermostat-temp">${temp}</div>
       <div class="thermostat-mode">${d.hvacStatus || d.thermostatMode || 'Thermostat'} · Set ${setpoint}</div>
       ${d.humidity !== null ? `<div class="device-status">💧 ${d.humidity}% humidity</div>` : ''}
+    </div>`;
+}
+
+function cameraCard(d) {
+  const protos = d.cameraLiveStream?.supportedProtocols || [];
+  const canLive = protos.includes('WEB_RTC') || protos.includes('RTSP');
+  const sub = d.online
+    ? (canLive ? 'Tap for live view' : 'Camera')
+    : 'Offline';
+  return `
+    <div class="device-card ${d.on ? 'on' : ''} device-card-camera" onclick="openModal('${d.id}')">
+      <span class="device-icon">${deviceIcon(d.kind)}</span>
+      <div class="device-name">${d.name}</div>
+      <div class="device-room">${d.room}</div>
+      <div class="device-status-row">
+        <span class="device-status">${sub}</span>
+        ${d.on !== undefined ? `<div class="toggle" onclick="toggleDevice('${d.id}', event)"></div>` : ''}
+      </div>
     </div>`;
 }
 
@@ -1372,12 +3337,202 @@ function applyColor(deviceId, hue, saturation) {
 }
 
 // ══════════════════════════════════════════
+//  CAMERA LIVE (WebRTC / RTSP via SDM)
+// ══════════════════════════════════════════
+function stopCameraLive() {
+  if (_camExtendTimer) {
+    clearInterval(_camExtendTimer);
+    _camExtendTimer = null;
+  }
+  const video = document.getElementById('cam-live-video');
+  if (video) {
+    video.srcObject = null;
+  }
+  if (_camPc) {
+    _camPc.close();
+    _camPc = null;
+  }
+  const devId = _camDeviceId;
+  const sess = _camMediaSessionId;
+  _camMediaSessionId = null;
+  _camDeviceId = null;
+  if (devId && sess && !isDemo) {
+    executeCommandWithResult(devId, 'sdm.devices.commands.CameraLiveStream.StopWebRtcStream', { mediaSessionId: sess });
+  }
+  const btnStart = document.getElementById('cam-btn-start');
+  const btnStop = document.getElementById('cam-btn-stop');
+  if (btnStart) btnStart.disabled = false;
+  if (btnStop) btnStop.disabled = true;
+  const st = document.getElementById('cam-live-status');
+  if (st) {
+    const backdrop = document.getElementById('modal-backdrop');
+    if (backdrop && backdrop.classList.contains('open')) {
+      st.textContent = 'Tap Start live to connect.';
+    }
+  }
+}
+
+async function extendCameraLive(deviceId) {
+  if (!_camMediaSessionId || !deviceId || isDemo) return;
+  const res = await executeCommandWithResult(deviceId,
+    'sdm.devices.commands.CameraLiveStream.ExtendWebRtcStream',
+    { mediaSessionId: _camMediaSessionId });
+  if (!res.ok) console.warn('ExtendWebRtcStream:', res.error);
+}
+
+async function startCameraLiveWebRtc(deviceId) {
+  stopCameraLive();
+  const statusEl = document.getElementById('cam-live-status');
+  const video = document.getElementById('cam-live-video');
+  const btnStart = document.getElementById('cam-btn-start');
+  const btnStop = document.getElementById('cam-btn-stop');
+  if (statusEl) statusEl.textContent = 'Connecting…';
+  if (btnStart) btnStart.disabled = true;
+  if (btnStop) btnStop.disabled = true;
+
+  const remoteStream = new MediaStream();
+  const servers = { sdpSemantics: 'unified-plan', iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+  const pc = new RTCPeerConnection(servers);
+
+  pc.ondatachannel = (ev) => {
+    ev.channel.onmessage = () => {};
+  };
+  pc.createDataChannel('dataSendChannel', { ordered: true });
+
+  pc.addEventListener('track', (ev) => {
+    remoteStream.addTrack(ev.track);
+    if (video) video.srcObject = remoteStream;
+  });
+
+  pc.addEventListener('iceconnectionstatechange', () => {
+    if (pc.iceConnectionState === 'failed' && statusEl) {
+      statusEl.textContent = 'Connection failed — tap Stop, then Start live again.';
+    }
+  });
+
+  const offerOptions = { offerToReceiveAudio: true, offerToReceiveVideo: true };
+  let offer;
+  try {
+    offer = await pc.createOffer(offerOptions);
+    await pc.setLocalDescription(offer);
+  } catch (err) {
+    if (statusEl) statusEl.textContent = err.message || 'WebRTC setup failed';
+    pc.close();
+    if (btnStart) btnStart.disabled = false;
+    return;
+  }
+
+  let offerSdp = pc.localDescription && pc.localDescription.sdp;
+  if (offerSdp && offerSdp[offerSdp.length - 1] !== '\n') offerSdp += '\n';
+
+  const res = await executeCommandWithResult(deviceId,
+    'sdm.devices.commands.CameraLiveStream.GenerateWebRtcStream',
+    { offerSdp });
+
+  if (!res.ok) {
+    if (statusEl) statusEl.textContent = res.error || 'Could not start stream';
+    pc.close();
+    if (btnStart) btnStart.disabled = false;
+    return;
+  }
+
+  const results = res.data.results || res.data;
+  let answerSdp = results.answerSdp;
+  const mediaSessionId = results.mediaSessionId;
+  if (!answerSdp) {
+    if (statusEl) statusEl.textContent = 'No answer from camera';
+    pc.close();
+    if (btnStart) btnStart.disabled = false;
+    return;
+  }
+  if (answerSdp[answerSdp.length - 1] !== '\n') answerSdp += '\n';
+
+  try {
+    await pc.setRemoteDescription({ type: 'answer', sdp: answerSdp });
+  } catch (err) {
+    if (statusEl) statusEl.textContent = err.message || 'Invalid stream answer';
+    pc.close();
+    if (btnStart) btnStart.disabled = false;
+    return;
+  }
+
+  _camPc = pc;
+  _camMediaSessionId = mediaSessionId;
+  _camDeviceId = deviceId;
+  if (statusEl) statusEl.textContent = 'Live';
+  if (btnStop) btnStop.disabled = false;
+
+  _camExtendTimer = setInterval(() => {
+    extendCameraLive(deviceId);
+  }, 4 * 60 * 1000);
+}
+
+function startCameraLiveFromModal() {
+  if (!_modalCameraId) return;
+  startCameraLiveWebRtc(_modalCameraId);
+}
+
+async function getRtspStreamUrl() {
+  const deviceId = _modalCameraId;
+  const box = document.getElementById('cam-rtsp-box');
+  if (!deviceId || !box) return;
+  box.style.display = 'block';
+  box.innerHTML = '<span class="value">Requesting stream URL…</span>';
+  const res = await executeCommandWithResult(deviceId,
+    'sdm.devices.commands.CameraLiveStream.GenerateRtspStream', {});
+  if (!res.ok) {
+    box.innerHTML = `<span class="value" style="color:var(--danger,#c44)">${res.error || 'Request failed'}</span>`;
+    return;
+  }
+  const results = res.data.results || res.data;
+  const url = (results.streamUrls && (results.streamUrls.rtspUrl || results.streamUrls.rtspsUrl)) || '';
+  _camRtspExtensionToken = results.streamExtensionToken || null;
+  const exp = results.expiresAt ? `Expires ${results.expiresAt}` : 'Session is short-lived — re-fetch before expiry (~5 min).';
+  box.innerHTML = `
+    <div><strong>RTSP</strong> · ${exp}</div>
+    <textarea id="cam-rtsp-text" readonly rows="3"></textarea>
+    <button type="button" class="btn-cam-copy" onclick="copyCamRtspUrl()">Copy URL</button>
+    <p class="wc-hint" style="margin:8px 0 0">Browsers cannot play RTSP. Use VLC, ffplay, or another RTSP client.</p>
+  `;
+  const ta = document.getElementById('cam-rtsp-text');
+  if (ta) ta.value = url;
+}
+
+function copyCamRtspUrl() {
+  const ta = document.getElementById('cam-rtsp-text');
+  if (!ta) return;
+  const v = ta.value;
+  navigator.clipboard.writeText(v).then(() => showToast('URL copied')).catch(() => {
+    ta.select();
+    showToast('Select and copy manually');
+  });
+}
+
+function toggleDeviceFromModal(id, e) {
+  e.stopPropagation();
+  const d = devices.find(x => x.id === id);
+  if (!d) return;
+  const newOn = !d.on;
+  d.on = newOn;
+  executeCommand(id, 'sdm.devices.commands.OnOff.Set', { on: newOn });
+  showToast(newOn ? '💡 Turned on' : '🌑 Turned off');
+  renderAll();
+  setTimeout(() => openModal(id), 700);
+}
+
+// ══════════════════════════════════════════
 //  MODAL
 // ══════════════════════════════════════════
 function openModal(id) {
   const d = devices.find(x => x.id === id);
   if (!d) return;
+  _modalCameraId = id;
   const modal = document.getElementById('modal-content');
+  const modalPanel = document.querySelector('#modal-backdrop .modal');
+  if (modalPanel) modalPanel.classList.toggle('modal-camera', d.kind === 'camera' || d.kind === 'doorbell');
+
+  stopCameraLive();
+  _camRtspExtensionToken = null;
 
   let extra = '';
   if (d.kind === 'thermostat') {
@@ -1401,6 +3556,50 @@ function openModal(id) {
         <span class="value">${d.hvacStatus || '--'}</span>
       </div>
       ${d.humidity !== null ? `<div class="modal-row"><label>Humidity</label><span class="value">${d.humidity}%</span></div>` : ''}
+    `;
+  } else if (d.kind === 'camera' || d.kind === 'doorbell') {
+    const protos = d.cameraLiveStream?.supportedProtocols || [];
+    const hasWebRtc = protos.includes('WEB_RTC');
+    const hasRtsp = protos.includes('RTSP');
+    const demoNote = isDemo ? '<p class="wc-hint" style="margin:0 0 12px">Demo mode — connect a real account to view live video.</p>' : '';
+    let statusText = '';
+    if (!d.online) statusText = 'Device offline.';
+    else if (isDemo) statusText = 'Demo — live stream unavailable.';
+    else if (hasWebRtc) statusText = 'Tap Start live for WebRTC preview.';
+    else if (hasRtsp) statusText = 'Use Get RTSP URL for VLC or another player.';
+    else statusText = 'No stream protocol reported for this device.';
+
+    extra = `
+      ${demoNote}
+      <div class="cam-live-wrap">
+        <video id="cam-live-video" class="cam-live-video" playsinline autoplay muted></video>
+        <div class="cam-live-status" id="cam-live-status">${statusText}</div>
+        <div class="cam-live-toolbar">
+          ${hasWebRtc ? `<button type="button" class="cam-btn-primary" id="cam-btn-start" onclick="startCameraLiveFromModal()" ${isDemo || !d.online ? 'disabled' : ''}>Start live</button>
+          <button type="button" id="cam-btn-stop" onclick="stopCameraLive()" disabled>Stop</button>` : ''}
+          ${hasRtsp ? `<button type="button" onclick="getRtspStreamUrl()" ${isDemo || !d.online ? 'disabled' : ''}>Get RTSP URL</button>` : ''}
+        </div>
+      </div>
+      <div id="cam-rtsp-box" class="cam-rtsp-box" style="display:none"></div>
+      <div class="modal-row">
+        <label>Room</label>
+        <span class="value">${d.room}</span>
+      </div>
+      <div class="modal-row">
+        <label>Connectivity</label>
+        <span class="value">${d.online ? '🟢 Online' : '🔴 Offline'}</span>
+      </div>
+      ${protos.length ? `<div class="modal-row"><label>Protocols</label><span class="value">${protos.join(', ')}</span></div>` : ''}
+      ${d.on !== undefined ? `
+      <div class="modal-row">
+        <label>Power</label>
+        <span class="value" style="display:flex;align-items:center;gap:12px;justify-content:flex-end">
+          ${d.on ? 'On' : 'Off'}
+          <span class="modal-toggle-wrap ${d.on ? 'on' : ''}" onclick="toggleDeviceFromModal('${id}', event)">
+            <div class="toggle"></div>
+          </span>
+        </span>
+      </div>` : ''}
     `;
   } else {
     const currentHex = d.colorHsv ? hsvToHex(d.colorHsv.hue, d.colorHsv.saturation, d.colorHsv.value) : '#ffffff';
@@ -1465,6 +3664,9 @@ function adjustTemp(id, delta) {
 
 function closeModal(e) {
   if (e && e.target !== document.getElementById('modal-backdrop')) return;
+  stopCameraLive();
+  _modalCameraId = null;
+  document.querySelector('#modal-backdrop .modal')?.classList.remove('modal-camera');
   document.getElementById('modal-backdrop').classList.remove('open');
 }
 
@@ -1509,6 +3711,1451 @@ function showToast(msg) {
 }
 
 // ══════════════════════════════════════════
+//  MAIN TAB NAVIGATION
+// ══════════════════════════════════════════
+let currentMainTab = 'devices';
+
+function switchMainTab(tab, el) {
+  currentMainTab = tab;
+  document.querySelectorAll('.main-nav-tab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.getElementById('devices-view').classList.toggle('active', tab === 'devices');
+  document.getElementById('media-view').classList.toggle('active', tab === 'media');
+  document.getElementById('calendar-view').classList.toggle('active', tab === 'calendar');
+  document.getElementById('weather-view').classList.toggle('active', tab === 'weather');
+  document.getElementById('world-clock-view').classList.toggle('active', tab === 'worldclock');
+  document.getElementById('markets-view').classList.toggle('active', tab === 'markets');
+  document.getElementById('photos-view').classList.toggle('active', tab === 'photos');
+  document.getElementById('livetv-view').classList.toggle('active', tab === 'livetv');
+  if (tab === 'media' && !ytAPILoaded) loadYouTubeAPI();
+  if (tab === 'calendar' && !calInitialized) initCalendar();
+  if (tab === 'weather' && !weatherInitialized) initWeather();
+  if (tab === 'worldclock') {
+    initWorldClock();
+    startWorldClockTimer();
+  } else {
+    stopWorldClockTimer();
+  }
+  if (tab === 'markets') {
+    initMarkets();
+    startMarketsTimer();
+  } else {
+    stopMarketsTimer();
+  }
+  if (tab === 'photos') initPhotosTab();
+  if (tab === 'livetv') ensureLiveTvFrame();
+}
+
+function ensureLiveTvFrame() {
+  const f = document.getElementById('livetv-iframe');
+  if (!f || !CONFIG.LIVE_TV_URL) return;
+  if (!f.dataset.loaded) {
+    f.src = CONFIG.LIVE_TV_URL;
+    f.dataset.loaded = '1';
+  }
+}
+
+function reloadLiveTvFrame() {
+  const f = document.getElementById('livetv-iframe');
+  if (f && CONFIG.LIVE_TV_URL) {
+    f.src = CONFIG.LIVE_TV_URL;
+    f.dataset.loaded = '1';
+  }
+  showToast('Live TV reloaded');
+}
+
+// ══════════════════════════════════════════
+//  MEDIA — YouTube IFrame API
+// ══════════════════════════════════════════
+let ytAPILoaded = false;
+let ytAPIReady = false;
+let ytPlayer = null;
+let mediaQueue = [];
+let currentQueueIndex = -1;
+let currentMediaTab = 'youtube';
+let progressInterval = null;
+
+function loadYouTubeAPI() {
+  if (ytAPILoaded) return;
+  ytAPILoaded = true;
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+}
+
+window.onYouTubeIframeAPIReady = function() {
+  ytAPIReady = true;
+};
+
+function switchMediaTab(tab, el) {
+  currentMediaTab = tab;
+  document.querySelectorAll('.media-tab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const inputRow = document.getElementById('media-input-row');
+  const input = document.getElementById('media-url-input');
+  const playBtn = document.getElementById('media-play-btn');
+
+  if (tab === 'subscriptions') {
+    inputRow.classList.add('hidden');
+    input.value = '';
+    loadSubscriptionFeed();
+    return;
+  }
+
+  inputRow.classList.remove('hidden');
+  playBtn.textContent = 'Play';
+  input.placeholder = tab === 'music'
+    ? 'Paste YouTube Music URL or search for music...'
+    : 'Paste a YouTube URL or search...';
+  input.value = '';
+  document.getElementById('search-results-area').innerHTML = '';
+}
+
+// ══════════════════════════════════════════
+//  MEDIA — URL PARSING
+// ══════════════════════════════════════════
+function extractVideoId(input) {
+  input = input.trim();
+  if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
+  const m = input.match(/(?:youtube\.com\/watch\?.*v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/|music\.youtube\.com\/watch\?.*v=)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+function extractPlaylistId(input) {
+  const m = input.match(/[?&]list=([a-zA-Z0-9_-]+)/);
+  return m ? m[1] : null;
+}
+
+// ══════════════════════════════════════════
+//  MEDIA — INPUT HANDLER
+// ══════════════════════════════════════════
+function handleMediaInput() {
+  const input = document.getElementById('media-url-input').value.trim();
+  if (!input) return;
+
+  const videoId = extractVideoId(input);
+  if (videoId) {
+    addToQueueAndPlay({ videoId, title: 'Loading...', channel: '', thumbnail: `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` });
+    fetchVideoInfo(videoId);
+    return;
+  }
+
+  if (currentMediaTab === 'subscriptions') return;
+
+  const apiKey = getYTApiKey();
+  if (apiKey || (accessToken && !isDemo)) {
+    searchYouTube(input, apiKey);
+  } else {
+    showToast('💡 Sign in with Google or add a YouTube API key to search');
+  }
+}
+
+// ══════════════════════════════════════════
+//  MEDIA — PLAYER
+// ══════════════════════════════════════════
+function createOrLoadPlayer(videoId) {
+  const placeholder = document.getElementById('player-placeholder');
+  if (placeholder) placeholder.remove();
+
+  if (!ytAPIReady) {
+    loadYouTubeAPI();
+    setTimeout(() => createOrLoadPlayer(videoId), 500);
+    return;
+  }
+
+  if (ytPlayer && ytPlayer.loadVideoById) {
+    ytPlayer.loadVideoById(videoId);
+    return;
+  }
+
+  const container = document.getElementById('yt-player-container');
+  const playerDiv = document.createElement('div');
+  playerDiv.id = 'yt-player';
+  container.appendChild(playerDiv);
+
+  ytPlayer = new YT.Player('yt-player', {
+    videoId,
+    playerVars: {
+      autoplay: 1,
+      modestbranding: 1,
+      rel: 0,
+      playsinline: 1,
+    },
+    events: {
+      onReady: onPlayerReady,
+      onStateChange: onPlayerStateChange,
+    },
+  });
+}
+
+function onPlayerReady(e) {
+  const vol = document.getElementById('volume-slider').value;
+  e.target.setVolume(parseInt(vol));
+  startProgressTracking();
+}
+
+function onPlayerStateChange(e) {
+  const state = e.data;
+  const btn = document.getElementById('play-pause-btn');
+  const dot = document.getElementById('nav-playing-dot');
+
+  if (state === YT.PlayerState.PLAYING) {
+    btn.textContent = '⏸';
+    dot.classList.add('visible');
+    startProgressTracking();
+  } else if (state === YT.PlayerState.PAUSED) {
+    btn.textContent = '▶';
+    stopProgressTracking();
+  } else if (state === YT.PlayerState.ENDED) {
+    btn.textContent = '▶';
+    dot.classList.remove('visible');
+    stopProgressTracking();
+    playNext();
+  } else if (state === YT.PlayerState.BUFFERING) {
+    btn.textContent = '⏸';
+  }
+}
+
+function togglePlayPause() {
+  if (!ytPlayer) return;
+  const state = ytPlayer.getPlayerState();
+  if (state === YT.PlayerState.PLAYING) {
+    ytPlayer.pauseVideo();
+  } else {
+    ytPlayer.playVideo();
+  }
+}
+
+function setVolume(val) {
+  const slider = document.getElementById('volume-slider');
+  slider.style.setProperty('--vol', val + '%');
+  if (ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(parseInt(val));
+}
+
+function seekTo(e) {
+  if (!ytPlayer || !ytPlayer.getDuration) return;
+  const bar = e.currentTarget;
+  const rect = bar.getBoundingClientRect();
+  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  ytPlayer.seekTo(pct * ytPlayer.getDuration(), true);
+}
+
+// ══════════════════════════════════════════
+//  MEDIA — PROGRESS TRACKING
+// ══════════════════════════════════════════
+function startProgressTracking() {
+  stopProgressTracking();
+  progressInterval = setInterval(updateProgress, 500);
+}
+
+function stopProgressTracking() {
+  if (progressInterval) { clearInterval(progressInterval); progressInterval = null; }
+}
+
+function updateProgress() {
+  if (!ytPlayer || !ytPlayer.getCurrentTime) return;
+  const current = ytPlayer.getCurrentTime();
+  const duration = ytPlayer.getDuration();
+  if (duration > 0) {
+    document.getElementById('progress-fill').style.width = (current / duration * 100) + '%';
+    document.getElementById('time-current').textContent = formatTime(current);
+    document.getElementById('time-duration').textContent = formatTime(duration);
+  }
+}
+
+function formatTime(s) {
+  s = Math.floor(s);
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  if (h > 0) return h + ':' + String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+  return m + ':' + String(sec).padStart(2, '0');
+}
+
+// ══════════════════════════════════════════
+//  MEDIA — QUEUE
+// ══════════════════════════════════════════
+function addToQueueAndPlay(item) {
+  const existingIdx = mediaQueue.findIndex(q => q.videoId === item.videoId);
+  if (existingIdx >= 0) {
+    currentQueueIndex = existingIdx;
+  } else {
+    mediaQueue.push(item);
+    currentQueueIndex = mediaQueue.length - 1;
+  }
+  playFromQueue(currentQueueIndex);
+  renderQueue();
+}
+
+function addToQueue(item) {
+  if (mediaQueue.some(q => q.videoId === item.videoId)) return;
+  mediaQueue.push(item);
+  renderQueue();
+  showToast('➕ Added to queue');
+}
+
+function playFromQueue(index) {
+  if (index < 0 || index >= mediaQueue.length) return;
+  currentQueueIndex = index;
+  const item = mediaQueue[index];
+  createOrLoadPlayer(item.videoId);
+  document.getElementById('now-playing-title').textContent = item.title;
+  document.getElementById('now-playing-channel').textContent = item.channel;
+  document.getElementById('progress-fill').style.width = '0%';
+  document.getElementById('time-current').textContent = '0:00';
+  renderQueue();
+}
+
+function playNext() {
+  if (currentQueueIndex < mediaQueue.length - 1) {
+    playFromQueue(currentQueueIndex + 1);
+  }
+}
+
+function playPrev() {
+  if (currentQueueIndex > 0) {
+    playFromQueue(currentQueueIndex - 1);
+  }
+}
+
+function clearQueue() {
+  const currentItem = mediaQueue[currentQueueIndex];
+  mediaQueue = currentItem ? [currentItem] : [];
+  currentQueueIndex = currentItem ? 0 : -1;
+  renderQueue();
+}
+
+function renderQueue() {
+  const section = document.getElementById('queue-section');
+  const list = document.getElementById('queue-list');
+  const upcoming = mediaQueue.filter((_, i) => i > currentQueueIndex);
+
+  if (upcoming.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = '';
+  list.innerHTML = upcoming.map((item, i) => {
+    const realIdx = currentQueueIndex + 1 + i;
+    return `
+      <div class="queue-item" onclick="playFromQueue(${realIdx})">
+        <img class="queue-item-thumb" src="${item.thumbnail}" alt="">
+        <div class="queue-item-info">
+          <div class="queue-item-title">${escapeHtml(item.title)}</div>
+          <div class="queue-item-channel">${escapeHtml(item.channel)}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function escapeHtml(s) {
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+
+// ══════════════════════════════════════════
+//  MEDIA — SEARCH (YouTube Data API v3)
+// ══════════════════════════════════════════
+function getYTApiKey() {
+  return document.getElementById('yt-api-key-input').value.trim() || localStorage.getItem('hp_yt_api_key') || '';
+}
+
+function saveYTApiKey(val) {
+  if (val.trim()) {
+    localStorage.setItem('hp_yt_api_key', val.trim());
+    showToast('✓ YouTube API key saved');
+  } else {
+    localStorage.removeItem('hp_yt_api_key');
+  }
+}
+
+async function searchYouTube(query, apiKey) {
+  const area = document.getElementById('search-results-area');
+  area.innerHTML = '<div class="media-empty"><div class="icon">🔍</div><p>Searching...</p></div>';
+
+  const useOAuth = accessToken && !isDemo;
+  if (!useOAuth && !apiKey) {
+    area.innerHTML = '<div class="media-empty"><div class="icon">🔑</div><p>Sign in with Google or add an API key to search.</p></div>';
+    return;
+  }
+
+  try {
+    const params = new URLSearchParams({
+      part: 'snippet',
+      type: 'video',
+      q: query,
+      maxResults: '8',
+    });
+    if (!useOAuth) params.set('key', apiKey);
+    if (currentMediaTab === 'music') params.set('videoCategoryId', '10');
+
+    const r = await fetch('https://www.googleapis.com/youtube/v3/search?' + params, useOAuth
+      ? { headers: { Authorization: 'Bearer ' + accessToken } }
+      : {});
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      throw new Error(err.error?.message || 'Search failed (' + r.status + ')');
+    }
+    const data = await r.json();
+    const items = (data.items || []).map(item => ({
+      videoId: item.id.videoId,
+      title: item.snippet.title,
+      channel: item.snippet.channelTitle,
+      thumbnail: item.snippet.thumbnails?.medium?.url || item.snippet.thumbnails?.default?.url || '',
+    }));
+
+    if (items.length === 0) {
+      area.innerHTML = '<div class="media-empty"><div class="icon">🤷</div><h3>No results</h3><p>Try a different search term.</p></div>';
+      return;
+    }
+
+    lastSearchResults = items;
+    area.innerHTML = `<div class="search-results">${items.map((item, i) => `
+      <div class="search-card" onclick="playSearchResult(${i})">
+        <img class="search-card-thumb" src="${item.thumbnail}" alt="" loading="lazy">
+        <div class="search-card-info">
+          <div class="search-card-title">${escapeHtml(item.title)}</div>
+          <div class="search-card-channel">${escapeHtml(item.channel)}</div>
+        </div>
+      </div>`).join('')}</div>`;
+  } catch (e) {
+    area.innerHTML = `<div class="media-empty"><div class="icon">⚠️</div><h3>Search error</h3><p>${escapeHtml(e.message)}</p></div>`;
+  }
+}
+
+let lastSearchResults = [];
+
+function playSearchResult(index) {
+  const item = lastSearchResults[index];
+  if (!item) return;
+  addToQueueAndPlay(item);
+  lastSearchResults.forEach((r, i) => {
+    if (i > index && !mediaQueue.some(q => q.videoId === r.videoId)) {
+      mediaQueue.push(r);
+    }
+  });
+  renderQueue();
+}
+
+async function fetchVideoInfo(videoId) {
+  try {
+    let r;
+    if (accessToken && !isDemo) {
+      r = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}`, {
+        headers: { Authorization: 'Bearer ' + accessToken }
+      });
+    } else {
+      const apiKey = getYTApiKey();
+      if (!apiKey) return;
+      r = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${apiKey}`);
+    }
+    if (!r.ok) return;
+    const data = await r.json();
+    const item = data.items?.[0];
+    if (!item) return;
+    const title = item.snippet.title;
+    const channel = item.snippet.channelTitle;
+    document.getElementById('now-playing-title').textContent = title;
+    document.getElementById('now-playing-channel').textContent = channel;
+    const qi = mediaQueue[currentQueueIndex];
+    if (qi && qi.videoId === videoId) {
+      qi.title = title;
+      qi.channel = channel;
+    }
+  } catch (e) {}
+}
+
+// ══════════════════════════════════════════
+//  MEDIA — SUBSCRIPTIONS FEED (OAuth)
+// ══════════════════════════════════════════
+async function loadSubscriptionFeed() {
+  const area = document.getElementById('search-results-area');
+  area.innerHTML = '<div class="media-empty"><div class="icon">📺</div><p>Loading your subscriptions…</p></div>';
+
+  if (isDemo) {
+    const demo = [
+      { videoId: 'dQw4w9WgXcQ', title: 'Latest from Creator One', channel: 'Creator One', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg', publishedAt: new Date().toISOString() },
+      { videoId: '9bZkp7q19f0', title: 'New music video drop', channel: 'Music Channel', thumbnail: 'https://img.youtube.com/vi/9bZkp7q19f0/mqdefault.jpg', publishedAt: new Date().toISOString() },
+      { videoId: 'L_jWHffIx5E', title: 'Tech review weekly', channel: 'Tech Daily', thumbnail: 'https://img.youtube.com/vi/L_jWHffIx5E/mqdefault.jpg', publishedAt: new Date().toISOString() },
+    ];
+    renderSubscriptionResults(demo);
+    return;
+  }
+
+  if (!accessToken) {
+    area.innerHTML = `<div class="media-empty"><div class="icon">🔐</div><h3>Sign in required</h3><p>Sign in with Google to load videos from channels you subscribe to. If you already signed in before this feature existed, sign out and sign in again to grant YouTube access.</p></div>`;
+    return;
+  }
+
+  try {
+    const subRes = await fetch(
+      'https://www.googleapis.com/youtube/v3/subscriptions?part=snippet&mine=true&maxResults=50',
+      { headers: { Authorization: 'Bearer ' + accessToken } }
+    );
+    if (!subRes.ok) {
+      const err = await subRes.json().catch(() => ({}));
+      throw new Error(err.error?.message || 'Could not load subscriptions (' + subRes.status + ')');
+    }
+    const subData = await subRes.json();
+    const subs = subData.items || [];
+    if (subs.length === 0) {
+      area.innerHTML = '<div class="media-empty"><div class="icon">📭</div><h3>No subscriptions</h3><p>Subscribe to channels on YouTube, then refresh this feed.</p></div>';
+      return;
+    }
+
+    const limited = subs.slice(0, 30);
+    const channelIds = limited.map(s => s.snippet.resourceId.channelId).join(',');
+
+    const chRes = await fetch(
+      'https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=' + encodeURIComponent(channelIds),
+      { headers: { Authorization: 'Bearer ' + accessToken } }
+    );
+    if (!chRes.ok) throw new Error('Could not load channel details');
+    const chData = await chRes.json();
+    const uploadsByChannel = {};
+    for (const ch of chData.items || []) {
+      const up = ch.contentDetails?.relatedPlaylists?.uploads;
+      if (up) uploadsByChannel[ch.id] = up;
+    }
+
+    const videos = [];
+    for (const sub of limited) {
+      const cid = sub.snippet.resourceId.channelId;
+      const plId = uploadsByChannel[cid];
+      if (!plId) continue;
+      const pr = await fetch(
+        'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=' + encodeURIComponent(plId) + '&maxResults=1',
+        { headers: { Authorization: 'Bearer ' + accessToken } }
+      );
+      if (!pr.ok) continue;
+      const pd = await pr.json();
+      const item = pd.items?.[0];
+      if (!item) continue;
+      const vid = item.contentDetails?.videoId || item.snippet?.resourceId?.videoId;
+      if (!vid) continue;
+      videos.push({
+        videoId: vid,
+        title: item.snippet.title,
+        channel: sub.snippet.title,
+        thumbnail: item.snippet.thumbnails?.medium?.url || item.snippet.thumbnails?.default?.url || `https://img.youtube.com/vi/${vid}/mqdefault.jpg`,
+        publishedAt: item.snippet.publishedAt || '',
+      });
+    }
+
+    videos.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+    renderSubscriptionResults(videos);
+  } catch (e) {
+    area.innerHTML = `<div class="media-empty"><div class="icon">⚠️</div><h3>Subscriptions error</h3><p>${escapeHtml(e.message)}</p><p style="margin-top:12px"><button class="btn-demo" onclick="loadSubscriptionFeed()">Try again</button></p></div>`;
+  }
+}
+
+function renderSubscriptionResults(items) {
+  const area = document.getElementById('search-results-area');
+  if (items.length === 0) {
+    area.innerHTML = '<div class="media-empty"><div class="icon">📭</div><p>No recent videos found.</p></div>';
+    return;
+  }
+  lastSearchResults = items;
+  area.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <span style="font-size:13px;color:var(--muted)">Latest from your subscriptions</span>
+      <button class="btn-demo" onclick="loadSubscriptionFeed()">↻ Refresh feed</button>
+    </div>
+    <div class="search-results">${items.map((item, i) => `
+      <div class="search-card" onclick="playSearchResult(${i})">
+        <img class="search-card-thumb" src="${item.thumbnail}" alt="" loading="lazy">
+        <div class="search-card-info">
+          <div class="search-card-title">${escapeHtml(item.title)}</div>
+          <div class="search-card-channel">${escapeHtml(item.channel)}</div>
+        </div>
+      </div>`).join('')}</div>`;
+}
+
+// ══════════════════════════════════════════
+//  WEATHER (Open-Meteo — no API key)
+// ══════════════════════════════════════════
+let weatherInitialized = false;
+let wxLat = null;
+let wxLon = null;
+let wxName = '';
+
+function initWeather() {
+  weatherInitialized = true;
+  if (isDemo) {
+    wxLat = 51.5074;
+    wxLon = -0.1278;
+    wxName = 'London (demo)';
+    loadWeather();
+    return;
+  }
+  const savedLat = localStorage.getItem('hp_wx_lat');
+  const savedLon = localStorage.getItem('hp_wx_lon');
+  const savedName = localStorage.getItem('hp_wx_name');
+  if (savedLat && savedLon) {
+    wxLat = parseFloat(savedLat);
+    wxLon = parseFloat(savedLon);
+    wxName = savedName || 'Saved location';
+    const inp = document.getElementById('wx-city-input');
+    if (inp && savedName) inp.value = savedName;
+    loadWeather();
+  } else {
+    document.getElementById('wx-content-area').innerHTML =
+      '<div class="wx-loading">Search for a city or tap <strong>Use my location</strong>.</div>';
+  }
+}
+
+async function searchWeatherCity() {
+  const q = document.getElementById('wx-city-input').value.trim();
+  if (!q) return;
+  document.getElementById('wx-content-area').innerHTML = '<div class="wx-loading">Searching…</div>';
+  try {
+    const r = await fetch('https://geocoding-api.open-meteo.com/v1/search?name=' + encodeURIComponent(q) + '&count=1&language=en&format=json');
+    const data = await r.json();
+    if (!data.results?.length) {
+      showToast('City not found');
+      document.getElementById('wx-content-area').innerHTML = '<div class="wx-error">No city found. Try another name.</div>';
+      return;
+    }
+    const loc = data.results[0];
+    wxLat = loc.latitude;
+    wxLon = loc.longitude;
+    wxName = loc.name + (loc.admin1 ? ', ' + loc.admin1 : '') + ', ' + loc.country_code;
+    localStorage.setItem('hp_wx_lat', String(wxLat));
+    localStorage.setItem('hp_wx_lon', String(wxLon));
+    localStorage.setItem('hp_wx_name', wxName);
+    loadWeather();
+  } catch (e) {
+    document.getElementById('wx-content-area').innerHTML = '<div class="wx-error">Search failed.</div>';
+  }
+}
+
+function useWeatherGeolocation() {
+  if (!navigator.geolocation) {
+    showToast('Geolocation not supported');
+    return;
+  }
+  document.getElementById('wx-content-area').innerHTML = '<div class="wx-loading">Getting location…</div>';
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      wxLat = pos.coords.latitude;
+      wxLon = pos.coords.longitude;
+      wxName = 'My location';
+      localStorage.setItem('hp_wx_lat', String(wxLat));
+      localStorage.setItem('hp_wx_lon', String(wxLon));
+      localStorage.setItem('hp_wx_name', wxName);
+      const inp = document.getElementById('wx-city-input');
+      if (inp) inp.value = '';
+      loadWeather();
+    },
+    () => {
+      showToast('Location denied');
+      document.getElementById('wx-content-area').innerHTML =
+        '<div class="wx-error">Location access denied. Search for a city instead.</div>';
+    },
+    { enableHighAccuracy: false, timeout: 15000 }
+  );
+}
+
+function wmoEmoji(code) {
+  if (code === 0) return '☀️';
+  if (code <= 3) return '⛅';
+  if (code <= 48) return '🌫️';
+  if (code <= 57) return '🌦️';
+  if (code <= 67) return '🌧️';
+  if (code <= 77) return '❄️';
+  if (code <= 82) return '🌧️';
+  if (code <= 86) return '❄️';
+  if (code <= 99) return '⛈️';
+  return '🌤️';
+}
+
+async function loadWeather() {
+  const area = document.getElementById('wx-content-area');
+  if (wxLat == null || wxLon == null) {
+    area.innerHTML = '<div class="wx-loading">Search a city or use my location.</div>';
+    return;
+  }
+  area.innerHTML = '<div class="wx-loading">Loading weather…</div>';
+  try {
+    const url = 'https://api.open-meteo.com/v1/forecast?latitude=' + wxLat + '&longitude=' + wxLon +
+      '&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m' +
+      '&hourly=temperature_2m,weather_code,precipitation_probability' +
+      '&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=7&forecast_hours=48';
+    const r = await fetch(url);
+    if (!r.ok) throw new Error('bad');
+    const data = await r.json();
+    const cur = data.current;
+    const daily = data.daily;
+    const hourly = data.hourly;
+    const code = cur.weather_code;
+    const emoji = wmoEmoji(code);
+    const name = wxName || 'Weather';
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const now = new Date();
+    let html = `
+      <div class="wx-hero">
+        <div class="wx-hero-main">
+          <div class="wx-emoji">${emoji}</div>
+          <div class="wx-temp-block">
+            <div class="wx-temp">${Math.round(cur.temperature_2m)}°</div>
+            <div class="wx-feels">Feels like ${Math.round(cur.apparent_temperature)}°</div>
+            <div class="wx-location">${escapeHtml(name)}</div>
+          </div>
+        </div>
+        <div class="wx-meta">
+          <span>💧 Humidity ${cur.relative_humidity_2m}%</span>
+          <span>💨 Wind ${Math.round(cur.wind_speed_10m)} km/h</span>
+        </div>
+      </div>`;
+
+    if (hourly && hourly.time && hourly.time.length) {
+      let startIdx = 0;
+      const nowMs = now.getTime();
+      for (let i = 0; i < hourly.time.length; i++) {
+        const slotStart = new Date(hourly.time[i]).getTime();
+        const slotEnd = slotStart + 60 * 60 * 1000;
+        if (nowMs >= slotStart && nowMs < slotEnd) {
+          startIdx = i;
+          break;
+        }
+        if (slotStart > nowMs) {
+          startIdx = i;
+          break;
+        }
+      }
+      const t0 = new Date(hourly.time[startIdx]).getTime();
+      const showNowLabel = nowMs >= t0 && nowMs < t0 + 60 * 60 * 1000;
+      const pops = hourly.precipitation_probability || [];
+
+      html += `<div class="wx-section-title">Next 24 hours</div><div class="wx-hourly-wrap"><div class="wx-hourly">`;
+      for (let h = 0; h < 24 && startIdx + h < hourly.time.length; h++) {
+        const idx = startIdx + h;
+        const t = new Date(hourly.time[idx]);
+        const label = (h === 0 && showNowLabel)
+          ? 'Now'
+          : t.toLocaleTimeString(undefined, { hour: 'numeric', hour12: true });
+        const wc = hourly.weather_code[idx];
+        const temp = hourly.temperature_2m[idx];
+        const pop = pops[idx];
+        const popStr = (pop != null && pop > 5) ? `${Math.round(pop)}% rain` : '';
+        const cls = (h === 0 && showNowLabel) ? 'wx-hour-slot wx-hour-now' : 'wx-hour-slot';
+        html += `<div class="${cls}" style="--wx-i:${h}">
+          <div class="wx-hour-time">${label}</div>
+          <div class="wx-hour-emoji">${wmoEmoji(wc)}</div>
+          <div class="wx-hour-temp">${Math.round(temp)}°</div>
+          ${popStr ? `<div class="wx-hour-pop">${popStr}</div>` : ''}
+        </div>`;
+      }
+      html += '</div></div>';
+    }
+
+    html += `<div class="wx-section-title">7-day outlook</div><div class="wx-daily">`;
+    for (let i = 0; i < Math.min(7, daily.time.length); i++) {
+      const d = new Date(daily.time[i] + 'T12:00:00');
+      const dayName = i === 0 ? 'Today' : days[d.getDay()];
+      const c = daily.weather_code[i];
+      html += `<div class="wx-day" style="--wx-d:${i}">
+        <div class="wx-day-name">${dayName}</div>
+        <div class="wx-day-emoji">${wmoEmoji(c)}</div>
+        <div class="wx-day-hi">${Math.round(daily.temperature_2m_max[i])}°</div>
+        <div class="wx-day-lo">${Math.round(daily.temperature_2m_min[i])}°</div>
+      </div>`;
+    }
+    html += '</div>';
+    area.innerHTML = html;
+  } catch (e) {
+    area.innerHTML = '<div class="wx-error">Could not load weather. Try again.</div>';
+  }
+}
+
+// ══════════════════════════════════════════
+//  WORLD CLOCK
+// ══════════════════════════════════════════
+let worldClockEntries = [];
+let worldClockInitialized = false;
+let worldClockTimer = null;
+
+const WC_STORAGE = 'hp_world_clocks';
+
+function loadWorldClockList() {
+  try {
+    const raw = localStorage.getItem(WC_STORAGE);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length) {
+        worldClockEntries = parsed;
+        return;
+      }
+    }
+  } catch (e) {}
+  worldClockEntries = [
+    { id: 'local', label: 'Local time', tz: null },
+    { id: 'utc', label: 'UTC', tz: 'UTC' },
+    { id: wcGenId(), label: 'Tokyo', tz: 'Asia/Tokyo' },
+    { id: wcGenId(), label: 'New York', tz: 'America/New_York' },
+  ];
+  saveWorldClockList();
+}
+
+function wcGenId() {
+  return 'wc_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+function saveWorldClockList() {
+  localStorage.setItem(WC_STORAGE, JSON.stringify(worldClockEntries));
+}
+
+function initWorldClock() {
+  if (!worldClockInitialized) {
+    worldClockInitialized = true;
+    loadWorldClockList();
+  }
+  renderWorldClocks();
+}
+
+function startWorldClockTimer() {
+  if (worldClockTimer) return;
+  worldClockTimer = setInterval(renderWorldClocks, 1000);
+}
+
+function stopWorldClockTimer() {
+  if (worldClockTimer) {
+    clearInterval(worldClockTimer);
+    worldClockTimer = null;
+  }
+}
+
+function formatWcTimeParts(tz) {
+  const now = new Date();
+  const o = { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true };
+  if (tz) o.timeZone = tz;
+  const parts = new Intl.DateTimeFormat(undefined, o).formatToParts(now);
+  let hm = '';
+  let sec = '';
+  let ampm = '';
+  for (const p of parts) {
+    if (p.type === 'hour' || p.type === 'minute') hm += p.value;
+    else if (p.type === 'literal') hm += p.value;
+    else if (p.type === 'second') sec = p.value;
+    else if (p.type === 'dayPeriod') ampm = p.value;
+  }
+  return { hm, sec, ampm };
+}
+
+function formatWcDateParts(tz) {
+  const now = new Date();
+  const w = { weekday: 'long' };
+  const d = { month: 'short', day: 'numeric', year: 'numeric' };
+  if (tz) {
+    w.timeZone = tz;
+    d.timeZone = tz;
+  }
+  return {
+    weekday: new Intl.DateTimeFormat(undefined, w).format(now),
+    rest: new Intl.DateTimeFormat(undefined, d).format(now),
+  };
+}
+
+function renderWorldClocks() {
+  const grid = document.getElementById('wc-grid');
+  if (!grid) return;
+  grid.innerHTML = worldClockEntries.map((entry, i) => {
+    const { hm, sec, ampm } = formatWcTimeParts(entry.tz);
+    const { weekday, rest } = formatWcDateParts(entry.tz);
+    const tzLine = entry.tz || Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local';
+    const isLocal = entry.tz === null;
+    const pill = isLocal ? 'This device' : 'World';
+    return `
+      <div class="wc-card${isLocal ? ' local' : ''}" style="--wc-i:${i}">
+        <div class="wc-card-inner">
+          <div class="wc-card-glow" aria-hidden="true"></div>
+          <span class="wc-pill">${pill}</span>
+          <button type="button" class="wc-remove" onclick="removeWorldClock('${entry.id}')" title="Remove from list">×</button>
+          <div class="wc-head">
+            <div class="wc-label">${escapeHtml(entry.label)}</div>
+            <div class="wc-tz">${escapeHtml(tzLine)}</div>
+          </div>
+          <div class="wc-time-row">
+            <div class="wc-time" aria-live="polite">
+              <span class="wc-time-hm">${escapeHtml(hm)}</span><span class="wc-time-sec">${sec ? ':' + escapeHtml(sec) : ''}</span>
+            </div>
+            ${ampm ? `<span class="wc-time-ampm">${escapeHtml(ampm)}</span>` : ''}
+          </div>
+          <div class="wc-date-block">
+            <span class="wc-date-wd">${escapeHtml(weekday)}</span>
+            <span class="wc-date-rest">${escapeHtml(rest)}</span>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function removeWorldClock(id) {
+  if (worldClockEntries.length <= 1) {
+    showToast('Keep at least one clock');
+    return;
+  }
+  worldClockEntries = worldClockEntries.filter(e => e.id !== id);
+  saveWorldClockList();
+  renderWorldClocks();
+}
+
+async function addWorldClockCity() {
+  const input = document.getElementById('wc-city-input');
+  const q = input.value.trim();
+  if (!q) return;
+  try {
+    const r = await fetch('https://geocoding-api.open-meteo.com/v1/search?name=' + encodeURIComponent(q) + '&count=1&language=en&format=json');
+    const data = await r.json();
+    if (!data.results?.length) {
+      showToast('City not found');
+      return;
+    }
+    const loc = data.results[0];
+    const tz = loc.timezone;
+    if (!tz) {
+      showToast('No timezone for this place');
+      return;
+    }
+    const label = loc.name + (loc.admin1 ? ', ' + loc.admin1 : '') + ', ' + loc.country_code;
+    if (worldClockEntries.some(e => e.tz === tz && e.tz !== null)) {
+      showToast('Already added');
+      return;
+    }
+    worldClockEntries.push({ id: wcGenId(), label, tz });
+    saveWorldClockList();
+    input.value = '';
+    renderWorldClocks();
+    showToast('Clock added');
+  } catch (e) {
+    showToast('Could not add city');
+  }
+}
+
+function addWorldClockPreset(tz, label) {
+  if (worldClockEntries.some(e => e.tz === tz)) {
+    showToast('Already in list');
+    return;
+  }
+  worldClockEntries.push({ id: wcGenId(), label, tz });
+  saveWorldClockList();
+  renderWorldClocks();
+  showToast('Added ' + label);
+}
+
+// ══════════════════════════════════════════
+//  MARKETS — Crypto (CoinGecko) + Stocks (Finnhub)
+// ══════════════════════════════════════════
+let cryptoWatch = [];
+let stockSymbols = [];
+let marketsInitialized = false;
+let marketsTimer = null;
+let currentMarketTab = 'crypto';
+let lastCryptoSearch = [];
+
+const MK_CRYPTO_KEY = 'hp_mk_crypto';
+const MK_STOCK_KEY = 'hp_mk_stocks';
+const MK_FINNHUB_KEY = 'hp_finnhub_key';
+
+function loadCryptoWatch() {
+  try {
+    const raw = localStorage.getItem(MK_CRYPTO_KEY);
+    if (raw) {
+      const p = JSON.parse(raw);
+      if (Array.isArray(p) && p.length) {
+        cryptoWatch = p;
+        return;
+      }
+    }
+  } catch (e) {}
+  cryptoWatch = [
+    { id: 'bitcoin', symbol: 'btc', name: 'Bitcoin' },
+    { id: 'ethereum', symbol: 'eth', name: 'Ethereum' },
+    { id: 'solana', symbol: 'sol', name: 'Solana' },
+  ];
+  saveCryptoWatch();
+}
+
+function saveCryptoWatch() {
+  localStorage.setItem(MK_CRYPTO_KEY, JSON.stringify(cryptoWatch));
+}
+
+function loadStockWatch() {
+  try {
+    const raw = localStorage.getItem(MK_STOCK_KEY);
+    if (raw) {
+      const p = JSON.parse(raw);
+      if (Array.isArray(p) && p.length) {
+        stockSymbols = p;
+        return;
+      }
+    }
+  } catch (e) {}
+  stockSymbols = ['AAPL', 'MSFT'];
+  saveStockWatch();
+}
+
+function saveStockWatch() {
+  localStorage.setItem(MK_STOCK_KEY, JSON.stringify(stockSymbols));
+}
+
+function getFinnhubKey() {
+  const el = document.getElementById('finnhub-key-input');
+  return (el && el.value.trim()) || localStorage.getItem(MK_FINNHUB_KEY) || '';
+}
+
+function saveFinnhubKey(val) {
+  if (val && val.trim()) {
+    localStorage.setItem(MK_FINNHUB_KEY, val.trim());
+    showToast('Finnhub key saved');
+  } else {
+    localStorage.removeItem(MK_FINNHUB_KEY);
+  }
+}
+
+function switchMarketTab(tab, el) {
+  currentMarketTab = tab;
+  document.querySelectorAll('#markets-view .media-tab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.getElementById('mk-crypto-panel').classList.toggle('active', tab === 'crypto');
+  document.getElementById('mk-stocks-panel').classList.toggle('active', tab === 'stocks');
+  document.getElementById('mk-crypto-dropdown').style.display = 'none';
+  refreshMarkets();
+}
+
+function initMarkets() {
+  if (!marketsInitialized) {
+    marketsInitialized = true;
+    loadCryptoWatch();
+    loadStockWatch();
+  }
+  refreshMarkets();
+}
+
+function startMarketsTimer() {
+  if (marketsTimer) return;
+  marketsTimer = setInterval(refreshMarkets, 60000);
+}
+
+function stopMarketsTimer() {
+  if (marketsTimer) {
+    clearInterval(marketsTimer);
+    marketsTimer = null;
+  }
+}
+
+async function refreshMarkets() {
+  if (currentMarketTab === 'crypto') {
+    await loadCryptoPrices();
+  } else {
+    await loadStockPrices();
+  }
+}
+
+async function searchCryptoAdd() {
+  const q = document.getElementById('mk-crypto-search').value.trim();
+  const dd = document.getElementById('mk-crypto-dropdown');
+  if (!q) {
+    dd.style.display = 'none';
+    return;
+  }
+  dd.style.display = 'block';
+  dd.innerHTML = '<div class="mk-search-item">Searching…</div>';
+  try {
+    const r = await fetch('https://api.coingecko.com/api/v3/search?query=' + encodeURIComponent(q));
+    const data = await r.json();
+    const coins = (data.coins || []).slice(0, 14);
+    lastCryptoSearch = coins;
+    if (!coins.length) {
+      dd.innerHTML = '<div class="mk-search-item">No coins found</div>';
+      return;
+    }
+    dd.innerHTML = coins.map((c, i) => `
+      <div class="mk-search-item" onclick="addCryptoFromSearch(${i})">
+        <div><strong>${escapeHtml(c.name)}</strong> <span>${escapeHtml(c.symbol)}</span></div>
+      </div>`).join('');
+  } catch (e) {
+    dd.innerHTML = '<div class="mk-search-item">Search failed</div>';
+  }
+}
+
+function addCryptoFromSearch(index) {
+  const c = lastCryptoSearch[index];
+  if (!c) return;
+  addCryptoCoin(c.id, c.symbol, c.name);
+}
+
+function addCryptoCoin(id, symbol, name) {
+  document.getElementById('mk-crypto-dropdown').style.display = 'none';
+  if (cryptoWatch.some(x => x.id === id)) {
+    showToast('Already in watchlist');
+    return;
+  }
+  cryptoWatch.push({ id, symbol, name });
+  saveCryptoWatch();
+  document.getElementById('mk-crypto-search').value = '';
+  loadCryptoPrices();
+  showToast('Added');
+}
+
+function removeCrypto(id) {
+  cryptoWatch = cryptoWatch.filter(x => x.id !== id);
+  saveCryptoWatch();
+  loadCryptoPrices();
+}
+
+async function loadCryptoPrices() {
+  const grid = document.getElementById('mk-crypto-grid');
+  if (!cryptoWatch.length) {
+    grid.innerHTML = '<div class="media-empty" style="grid-column:1/-1"><p>No coins in list — search above to add.</p></div>';
+    return;
+  }
+  const ids = cryptoWatch.map(c => c.id).join(',');
+  try {
+    const r = await fetch(
+      'https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(ids) + '&vs_currencies=usd&include_24hr_change=true'
+    );
+    if (!r.ok) throw new Error('err');
+    const prices = await r.json();
+    grid.innerHTML = cryptoWatch.map(c => {
+      const p = prices[c.id];
+      if (!p) {
+        return `<div class="mk-card"><div class="mk-name">${escapeHtml(c.name)}</div><div class="mk-meta">No price data</div></div>`;
+      }
+      const usd = p.usd;
+      const ch = p.usd_24h_change;
+      const chClass = ch >= 0 ? 'up' : 'down';
+      const chStr = ch != null ? ((ch >= 0 ? '+' : '') + ch.toFixed(2) + '% (24h)') : '';
+      const priceStr = usd < 1
+        ? '$' + usd.toFixed(4)
+        : '$' + usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return `
+        <div class="mk-card">
+          <button type="button" class="mk-remove" onclick="removeCrypto('${c.id}')">×</button>
+          <div class="mk-name">${escapeHtml(c.name)}</div>
+          <div class="mk-symbol">${escapeHtml(String(c.symbol))}</div>
+          <div class="mk-price">${priceStr}</div>
+          ${ch != null ? `<div class="mk-change ${chClass}">${escapeHtml(chStr)}</div>` : ''}
+        </div>`;
+    }).join('');
+  } catch (e) {
+    grid.innerHTML = '<div class="wx-error" style="grid-column:1/-1">Could not load crypto (rate limit or network). Try Refresh in a minute.</div>';
+  }
+}
+
+function addStockSymbol() {
+  const input = document.getElementById('mk-stock-input');
+  let sym = input.value.trim().toUpperCase().replace(/[^A-Z0-9.\-]/g, '');
+  if (!sym) return;
+  if (stockSymbols.includes(sym)) {
+    showToast('Already added');
+    return;
+  }
+  stockSymbols.push(sym);
+  saveStockWatch();
+  input.value = '';
+  loadStockPrices();
+}
+
+function removeStock(sym) {
+  stockSymbols = stockSymbols.filter(s => s !== sym);
+  saveStockWatch();
+  loadStockPrices();
+}
+
+async function loadStockPrices() {
+  const grid = document.getElementById('mk-stocks-grid');
+  const key = getFinnhubKey();
+  if (!key) {
+    grid.innerHTML = '<div class="media-empty" style="grid-column:1/-1"><p>Add a free Finnhub API key above. Register at <a href="https://finnhub.io" target="_blank" rel="noopener" style="color:var(--accent)">finnhub.io</a>.</p></div>';
+    return;
+  }
+  if (!stockSymbols.length) {
+    grid.innerHTML = '<div class="media-empty" style="grid-column:1/-1"><p>Add ticker symbols (e.g. NVDA, GOOGL).</p></div>';
+    return;
+  }
+  grid.innerHTML = '<div class="wx-loading" style="grid-column:1/-1">Loading quotes…</div>';
+  try {
+    const results = await Promise.all(stockSymbols.map(async sym => {
+      const r = await fetch(
+        'https://finnhub.io/api/v1/quote?symbol=' + encodeURIComponent(sym) + '&token=' + encodeURIComponent(key)
+      );
+      const q = r.ok ? await r.json() : null;
+      return { sym, q };
+    }));
+    grid.innerHTML = results.map(({ sym, q }) => {
+      if (!q || q.error) {
+        return `
+          <div class="mk-card">
+            <button type="button" class="mk-remove" onclick="removeStock('${sym}')">×</button>
+            <div class="mk-name">${escapeHtml(sym)}</div>
+            <div class="mk-meta">No data — check symbol</div>
+          </div>`;
+      }
+      const ch = q.dp;
+      const chClass = ch == null ? '' : (ch >= 0 ? 'up' : 'down');
+      const chStr = ch != null ? ((ch >= 0 ? '+' : '') + ch.toFixed(2) + '%') : '';
+      return `
+        <div class="mk-card">
+          <button type="button" class="mk-remove" onclick="removeStock('${sym}')">×</button>
+          <div class="mk-name">${escapeHtml(sym)}</div>
+          <div class="mk-symbol">US quote</div>
+          <div class="mk-price">$${q.c.toFixed(2)}</div>
+          ${ch != null ? `<div class="mk-change ${chClass}">${escapeHtml(chStr)}</div>` : ''}
+          <div class="mk-meta">Prev close ${q.pc != null ? '$' + q.pc.toFixed(2) : '—'}</div>
+        </div>`;
+    }).join('');
+  } catch (e) {
+    grid.innerHTML = '<div class="wx-error" style="grid-column:1/-1">Could not load stocks. Check API key.</div>';
+  }
+}
+
+// ══════════════════════════════════════════
+//  CALENDAR
+// ══════════════════════════════════════════
+let calInitialized = false;
+let calViewDate = new Date();
+let calSelectedDate = new Date();
+let calEvents = [];
+
+function initCalendar() {
+  calInitialized = true;
+  calViewDate = new Date();
+  calSelectedDate = new Date();
+  renderCalendar();
+  loadCalendarEvents();
+}
+
+function calNavigate(dir) {
+  calViewDate.setMonth(calViewDate.getMonth() + dir);
+  renderCalendar();
+  loadCalendarEvents();
+}
+
+function calGoToday() {
+  calViewDate = new Date();
+  calSelectedDate = new Date();
+  renderCalendar();
+  loadCalendarEvents();
+}
+
+function renderCalendar() {
+  const year = calViewDate.getFullYear();
+  const month = calViewDate.getMonth();
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-month-title').textContent = monthNames[month] + ' ' + year;
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInPrev = new Date(year, month, 0).getDate();
+
+  const today = new Date();
+  const todayStr = dateStr(today);
+  const selectedStr = dateStr(calSelectedDate);
+
+  let html = '';
+
+  for (let i = firstDay - 1; i >= 0; i--) {
+    const d = daysInPrev - i;
+    html += `<div class="cal-day other-month">${d}</div>`;
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const ds = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    const isToday = ds === todayStr;
+    const isSelected = ds === selectedStr && !isToday;
+    const eventsOnDay = calEvents.filter(e => eventOnDate(e, ds));
+    const dots = eventsOnDay.length > 0
+      ? `<div class="event-dots">${eventsOnDay.slice(0, 3).map(() => '<span></span>').join('')}</div>`
+      : '';
+    html += `<div class="cal-day${isToday ? ' today' : ''}${isSelected ? ' selected' : ''}" onclick="selectCalDay(${year},${month},${d})">${d}${dots}</div>`;
+  }
+
+  const totalCells = firstDay + daysInMonth;
+  const remaining = (7 - (totalCells % 7)) % 7;
+  for (let d = 1; d <= remaining; d++) {
+    html += `<div class="cal-day other-month">${d}</div>`;
+  }
+
+  document.getElementById('cal-days').innerHTML = html;
+  renderAgenda();
+}
+
+function dateStr(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function eventOnDate(ev, ds) {
+  if (ev.allDay) {
+    return ds >= ev.startDate && ds <= ev.endDate;
+  }
+  const evDay = ev.start.toISOString().slice(0, 10);
+  return evDay === ds;
+}
+
+function selectCalDay(y, m, d) {
+  calSelectedDate = new Date(y, m, d);
+  renderCalendar();
+}
+
+function renderAgenda() {
+  const ds = dateStr(calSelectedDate);
+  const dayEvents = calEvents.filter(e => eventOnDate(e, ds));
+  const area = document.getElementById('cal-agenda-area');
+
+  const dayLabel = calSelectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+  if (dayEvents.length === 0) {
+    area.innerHTML = `
+      <div class="cal-agenda-header">${dayLabel}</div>
+      <div class="cal-no-events">
+        <div class="icon">✨</div>
+        <p>No events — enjoy your free time!</p>
+      </div>`;
+    return;
+  }
+
+  const allDay = dayEvents.filter(e => e.allDay);
+  const timed = dayEvents.filter(e => !e.allDay).sort((a, b) => a.start - b.start);
+  const colorClasses = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5'];
+
+  let html = `<div class="cal-agenda"><div class="cal-agenda-header">${dayLabel} <span class="day-label">${dayEvents.length} event${dayEvents.length > 1 ? 's' : ''}</span></div>`;
+
+  allDay.forEach((ev, i) => {
+    html += `<div class="cal-event-allday ${colorClasses[i % colorClasses.length]}">
+      <div class="cal-event-title">${escapeHtml(ev.title)}</div>
+    </div>`;
+  });
+
+  timed.forEach((ev, i) => {
+    const timeStr = ev.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const endStr = ev.end ? ev.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+    const location = ev.location ? `<span>📍 ${escapeHtml(ev.location)}</span>` : '';
+    const duration = ev.end ? `<span>${timeStr} – ${endStr}</span>` : '';
+
+    html += `<div class="cal-event ${colorClasses[(i + allDay.length) % colorClasses.length]}">
+      <div class="cal-event-time">${timeStr}</div>
+      <div class="cal-event-body">
+        <div class="cal-event-title">${escapeHtml(ev.title)}</div>
+        <div class="cal-event-meta">${duration}${location}</div>
+      </div>
+    </div>`;
+  });
+
+  html += '</div>';
+  area.innerHTML = html;
+}
+
+// ── Fetch from Google Calendar API ──
+async function loadCalendarEvents() {
+  if (isDemo) { loadDemoCalendarEvents(); return; }
+  if (!accessToken) return;
+
+  const year = calViewDate.getFullYear();
+  const month = calViewDate.getMonth();
+  const timeMin = new Date(year, month, 1).toISOString();
+  const timeMax = new Date(year, month + 1, 0, 23, 59, 59).toISOString();
+
+  try {
+    const params = new URLSearchParams({
+      timeMin,
+      timeMax,
+      singleEvents: 'true',
+      orderBy: 'startTime',
+      maxResults: '100',
+    });
+    const r = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?' + params, {
+      headers: { Authorization: 'Bearer ' + accessToken }
+    });
+    if (!r.ok) throw new Error('Calendar API error ' + r.status);
+    const data = await r.json();
+    calEvents = (data.items || []).map(parseCalEvent).filter(Boolean);
+    renderCalendar();
+  } catch (e) {
+    console.error('Calendar:', e);
+    if (calEvents.length === 0) {
+      document.getElementById('cal-agenda-area').innerHTML = `
+        <div class="cal-no-events">
+          <div class="icon">⚠️</div>
+          <p>Could not load calendar. Make sure you granted calendar permission when signing in.</p>
+        </div>`;
+    }
+  }
+}
+
+function parseCalEvent(item) {
+  if (item.status === 'cancelled') return null;
+
+  const allDay = !!item.start?.date;
+  let start, end, startDate, endDate;
+
+  if (allDay) {
+    startDate = item.start.date;
+    endDate = item.end?.date || startDate;
+    const endD = new Date(endDate);
+    endD.setDate(endD.getDate() - 1);
+    endDate = dateStr(endD);
+    start = new Date(startDate + 'T00:00:00');
+    end = new Date(endDate + 'T23:59:59');
+  } else {
+    start = new Date(item.start.dateTime);
+    end = item.end?.dateTime ? new Date(item.end.dateTime) : null;
+    startDate = dateStr(start);
+    endDate = end ? dateStr(end) : startDate;
+  }
+
+  return {
+    id: item.id,
+    title: item.summary || '(No title)',
+    location: item.location || '',
+    allDay,
+    start,
+    end,
+    startDate,
+    endDate,
+  };
+}
+
+// ── Demo calendar events ──
+function loadDemoCalendarEvents() {
+  const today = new Date();
+  const y = today.getFullYear(), m = today.getMonth(), d = today.getDate();
+
+  calEvents = [
+    { id: 'e1', title: 'Morning Standup', location: 'Google Meet', allDay: false,
+      start: new Date(y, m, d, 9, 0), end: new Date(y, m, d, 9, 30),
+      startDate: dateStr(new Date(y, m, d)), endDate: dateStr(new Date(y, m, d)) },
+    { id: 'e2', title: 'Sprint Planning', location: 'Conference Room B', allDay: false,
+      start: new Date(y, m, d, 10, 0), end: new Date(y, m, d, 11, 0),
+      startDate: dateStr(new Date(y, m, d)), endDate: dateStr(new Date(y, m, d)) },
+    { id: 'e3', title: 'Lunch with Alex', location: 'Cafe Milano', allDay: false,
+      start: new Date(y, m, d, 12, 30), end: new Date(y, m, d, 13, 30),
+      startDate: dateStr(new Date(y, m, d)), endDate: dateStr(new Date(y, m, d)) },
+    { id: 'e4', title: 'Code Review', location: '', allDay: false,
+      start: new Date(y, m, d, 15, 0), end: new Date(y, m, d, 15, 45),
+      startDate: dateStr(new Date(y, m, d)), endDate: dateStr(new Date(y, m, d)) },
+    { id: 'e5', title: 'Team Building', location: '', allDay: true,
+      start: new Date(y, m, d + 1, 0, 0), end: new Date(y, m, d + 1, 23, 59),
+      startDate: dateStr(new Date(y, m, d + 1)), endDate: dateStr(new Date(y, m, d + 1)) },
+    { id: 'e6', title: '1:1 with Manager', location: 'Zoom', allDay: false,
+      start: new Date(y, m, d + 1, 14, 0), end: new Date(y, m, d + 1, 14, 30),
+      startDate: dateStr(new Date(y, m, d + 1)), endDate: dateStr(new Date(y, m, d + 1)) },
+    { id: 'e7', title: 'Dentist Appointment', location: 'City Dental Clinic', allDay: false,
+      start: new Date(y, m, d + 2, 11, 0), end: new Date(y, m, d + 2, 12, 0),
+      startDate: dateStr(new Date(y, m, d + 2)), endDate: dateStr(new Date(y, m, d + 2)) },
+    { id: 'e8', title: 'Project Deadline', location: '', allDay: true,
+      start: new Date(y, m, d + 4, 0, 0), end: new Date(y, m, d + 4, 23, 59),
+      startDate: dateStr(new Date(y, m, d + 4)), endDate: dateStr(new Date(y, m, d + 4)) },
+    { id: 'e9', title: 'Yoga Class', location: 'FitZone Gym', allDay: false,
+      start: new Date(y, m, d + 3, 18, 0), end: new Date(y, m, d + 3, 19, 0),
+      startDate: dateStr(new Date(y, m, d + 3)), endDate: dateStr(new Date(y, m, d + 3)) },
+  ];
+  renderCalendar();
+}
+
+// ══════════════════════════════════════════
 //  DEMO MODE
 // ══════════════════════════════════════════
 function loadDemoMode() {
@@ -1527,13 +5174,371 @@ function loadDemoDevices() {
     { id: 'd4', name: 'Nest Thermostat', kind: 'thermostat', room: 'Living Room', online: true, on: true, temperature: 21.5, setpoint: 22.0, hvacStatus: 'HEATING', thermostatMode: 'HEAT', humidity: 45 },
     { id: 'd5', name: 'Bedroom Light', kind: 'light', room: 'Bedroom', online: true, on: false, brightness: 100, colorHsv: { hue: 240, saturation: 0.6, value: 1 } },
     { id: 'd6', name: 'TV', kind: 'switch', room: 'Living Room', online: true, on: true, brightness: null },
-    { id: 'd7', name: 'Front Door Camera', kind: 'camera', room: 'Entrance', online: true, on: true, brightness: null },
+    { id: 'd7', name: 'Front Door Camera', kind: 'camera', room: 'Entrance', online: true, on: true, brightness: null,
+      cameraLiveStream: { supportedProtocols: ['WEB_RTC', 'RTSP'], maxVideoResolution: { width: 1920, height: 1080 } } },
     { id: 'd8', name: 'Coffee Maker', kind: 'switch', room: 'Kitchen', online: false, on: false, brightness: null },
     { id: 'd9', name: 'Bathroom Light', kind: 'light', room: 'Bathroom', online: true, on: false, brightness: 70, colorHsv: { hue: 160, saturation: 0.5, value: 1 } },
-    { id: 'd10', name: 'Doorbell', kind: 'doorbell', room: 'Entrance', online: true, on: true, brightness: null },
+    { id: 'd10', name: 'Doorbell', kind: 'doorbell', room: 'Entrance', online: true, on: true, brightness: null,
+      cameraLiveStream: { supportedProtocols: ['WEB_RTC'], maxVideoResolution: { width: 640, height: 480 } } },
   ];
   renderAll();
   showToast('🎭 Demo mode — changes won\'t affect real devices');
+}
+
+// ══════════════════════════════════════════
+//  PHOTOS + SCREEN SAVER (IndexedDB)
+// ══════════════════════════════════════════
+const PHOTO_DB = 'hp_photo_screensaver';
+const PHOTO_STORE = 'photos';
+let cachedPhotoRows = null;
+let screensaverActive = false;
+let ssSlideTimer = null;
+let ssClockTimer = null;
+let ssUrls = [];
+let ssSlideIdx = 0;
+let ssFirstSlide = true;
+let lastActivityTime = Date.now();
+let screensaverIdleInited = false;
+
+function idbOpen() {
+  return new Promise((resolve, reject) => {
+    const r = indexedDB.open(PHOTO_DB, 1);
+    r.onupgradeneeded = () => {
+      if (!r.result.objectStoreNames.contains(PHOTO_STORE)) {
+        r.result.createObjectStore(PHOTO_STORE, { keyPath: 'id', autoIncrement: true });
+      }
+    };
+    r.onsuccess = () => resolve(r.result);
+    r.onerror = () => reject(r.error);
+  });
+}
+
+async function idbAddPhoto(blob) {
+  const db = await idbOpen();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(PHOTO_STORE, 'readwrite');
+    tx.objectStore(PHOTO_STORE).add({ blob, created: Date.now() });
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function idbGetAllPhotos() {
+  const db = await idbOpen();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(PHOTO_STORE, 'readonly');
+    const req = tx.objectStore(PHOTO_STORE).getAll();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function idbDeletePhoto(id) {
+  const db = await idbOpen();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(PHOTO_STORE, 'readwrite');
+    tx.objectStore(PHOTO_STORE).delete(id);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function refreshPhotoCache() {
+  cachedPhotoRows = await idbGetAllPhotos();
+  return cachedPhotoRows;
+}
+
+function initPhotosTab() {
+  loadScreensaverSettingsUI();
+  renderPhotoGrid();
+  refreshPhotoCache();
+}
+
+function loadScreensaverSettingsUI() {
+  const en = document.getElementById('ss-enabled');
+  const idle = document.getElementById('ss-idle-min');
+  const slide = document.getElementById('ss-slide-sec');
+  if (en) en.checked = localStorage.getItem('hp_ss_enabled') !== '0';
+  if (idle) idle.value = localStorage.getItem('hp_ss_idle') || '5';
+  if (slide) slide.value = localStorage.getItem('hp_ss_slide') || '12';
+}
+
+function saveScreensaverSettings() {
+  const en = document.getElementById('ss-enabled');
+  const idle = document.getElementById('ss-idle-min');
+  const slide = document.getElementById('ss-slide-sec');
+  if (en) localStorage.setItem('hp_ss_enabled', en.checked ? '1' : '0');
+  if (idle) localStorage.setItem('hp_ss_idle', idle.value);
+  if (slide) localStorage.setItem('hp_ss_slide', slide.value);
+  resetIdleTimer();
+}
+
+async function handlePhotoFiles(files) {
+  if (!files || !files.length) return;
+  for (const f of files) {
+    if (!f.type.startsWith('image/')) continue;
+    await idbAddPhoto(f);
+  }
+  await refreshPhotoCache();
+  renderPhotoGrid();
+  showToast('Photos saved');
+}
+
+async function renderPhotoGrid() {
+  const grid = document.getElementById('ph-grid');
+  if (!grid) return;
+  grid.querySelectorAll('.ph-thumb img').forEach(img => {
+    if (img.src && img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
+  });
+  const rows = await idbGetAllPhotos();
+  cachedPhotoRows = rows;
+  if (!rows.length) {
+    grid.innerHTML = '<p class="wc-hint" style="grid-column:1/-1">No photos yet — use the box above.</p>';
+    return;
+  }
+  grid.innerHTML = rows.map(row => {
+    const url = URL.createObjectURL(row.blob);
+    return `<div class="ph-thumb">
+      <img src="${url}" alt="">
+      <button type="button" onclick="deletePhoto(${row.id},event)">×</button>
+    </div>`;
+  }).join('');
+}
+
+async function deletePhoto(id, e) {
+  if (e) {
+    e.stopPropagation();
+    const img = e.target && e.target.closest('.ph-thumb') && e.target.closest('.ph-thumb').querySelector('img');
+    if (img && img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
+  }
+  await idbDeletePhoto(id);
+  await refreshPhotoCache();
+  renderPhotoGrid();
+}
+
+function initScreensaverIdle() {
+  if (screensaverIdleInited) {
+    resetIdleTimer();
+    return;
+  }
+  screensaverIdleInited = true;
+  const act = () => {
+    if (!screensaverActive) lastActivityTime = Date.now();
+  };
+  ['pointerdown', 'keydown', 'touchstart', 'wheel', 'scroll'].forEach(ev => {
+    document.addEventListener(ev, act, { passive: true, capture: true });
+  });
+  let moveT = 0;
+  document.addEventListener('pointermove', () => {
+    const n = Date.now();
+    if (n - moveT < 2500) return;
+    moveT = n;
+    act();
+  }, { passive: true, capture: true });
+  setInterval(checkIdleForScreensaver, 1000);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && screensaverActive) {
+      e.preventDefault();
+      stopScreensaver();
+    }
+  }, true);
+  resetIdleTimer();
+  refreshPhotoCache();
+}
+
+function resetIdleTimer() {
+  lastActivityTime = Date.now();
+}
+
+function checkIdleForScreensaver() {
+  if (screensaverActive) return;
+  const dash = document.getElementById('dashboard');
+  if (!dash || dash.style.display === 'none') return;
+  if (localStorage.getItem('hp_ss_enabled') === '0') return;
+  const min = parseInt(localStorage.getItem('hp_ss_idle') || '5', 10);
+  const ms = min * 60 * 1000;
+  if (Date.now() - lastActivityTime < ms) return;
+  if (cachedPhotoRows === null) return;
+  if (!cachedPhotoRows.length) return;
+  startScreensaver(cachedPhotoRows);
+}
+
+function updateSsClock() {
+  const el = document.getElementById('ss-clock');
+  if (!el) return;
+  el.textContent = new Date().toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
+}
+
+function startScreensaver(photoRows) {
+  if (!photoRows || !photoRows.length) return;
+  stopScreensaverInner();
+  screensaverActive = true;
+  ssUrls = photoRows.map(r => URL.createObjectURL(r.blob));
+  ssSlideIdx = 0;
+  ssFirstSlide = true;
+  const ov = document.getElementById('screensaver-overlay');
+  const img = document.getElementById('ss-main-img');
+  if (ov) ov.classList.add('ss-visible');
+  showSlide(0);
+  const slideSec = parseInt(localStorage.getItem('hp_ss_slide') || '12', 10);
+  ssSlideTimer = setInterval(() => {
+    ssSlideIdx = (ssSlideIdx + 1) % ssUrls.length;
+    showSlide(ssSlideIdx);
+  }, Math.max(6, slideSec) * 1000);
+  ssClockTimer = setInterval(updateSsClock, 1000);
+  updateSsClock();
+}
+
+function showSlide(i) {
+  const img = document.getElementById('ss-main-img');
+  if (!img || !ssUrls[i]) return;
+  if (ssFirstSlide) {
+    img.onload = () => {
+      img.classList.add('ss-opaque');
+      ssFirstSlide = false;
+    };
+    img.src = ssUrls[i];
+    if (img.complete) {
+      img.classList.add('ss-opaque');
+      ssFirstSlide = false;
+    }
+    return;
+  }
+  img.classList.remove('ss-opaque');
+  setTimeout(() => {
+    img.onload = () => {
+      requestAnimationFrame(() => img.classList.add('ss-opaque'));
+    };
+    img.src = ssUrls[i];
+    if (img.complete) {
+      requestAnimationFrame(() => img.classList.add('ss-opaque'));
+    }
+  }, 450);
+}
+
+function stopScreensaverInner() {
+  if (ssSlideTimer) {
+    clearInterval(ssSlideTimer);
+    ssSlideTimer = null;
+  }
+  if (ssClockTimer) {
+    clearInterval(ssClockTimer);
+    ssClockTimer = null;
+  }
+  ssUrls.forEach(u => {
+    try { URL.revokeObjectURL(u); } catch (x) {}
+  });
+  ssUrls = [];
+  screensaverActive = false;
+  const img = document.getElementById('ss-main-img');
+  if (img) {
+    img.src = '';
+    img.classList.remove('ss-opaque');
+  }
+}
+
+function stopScreensaver() {
+  const ov = document.getElementById('screensaver-overlay');
+  if (ov) ov.classList.remove('ss-visible');
+  stopScreensaverInner();
+  resetIdleTimer();
+}
+
+async function testScreensaver() {
+  const rows = await idbGetAllPhotos();
+  cachedPhotoRows = rows;
+  if (!rows.length) {
+    showToast('Add at least one photo first');
+    return;
+  }
+  startScreensaver(rows);
+}
+
+// ══════════════════════════════════════════
+//  WAKE LOCK (keep screen on)
+// ══════════════════════════════════════════
+let wakeLock = null;
+let wakeLockEnabled = false;
+
+function wakeLockSupported() {
+  return 'wakeLock' in navigator;
+}
+
+async function acquireWakeLock() {
+  if (!wakeLockSupported()) return false;
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+    wakeLock.addEventListener('release', () => {
+      wakeLock = null;
+      if (!wakeLockEnabled) updateWakeLockUI(false);
+    });
+    return true;
+  } catch (e) {
+    console.warn('Wake Lock failed:', e);
+    return false;
+  }
+}
+
+async function releaseWakeLock() {
+  if (wakeLock) {
+    await wakeLock.release();
+    wakeLock = null;
+  }
+}
+
+async function toggleWakeLock() {
+  if (!wakeLockSupported()) {
+    showToast('⚠️ Wake Lock not supported on this browser');
+    return;
+  }
+  wakeLockEnabled = !wakeLockEnabled;
+
+  if (wakeLockEnabled) {
+    const ok = await acquireWakeLock();
+    if (ok) {
+      localStorage.setItem('hp_wakelock', '1');
+      updateWakeLockUI(true);
+      showToast('☀️ Screen will stay on');
+    } else {
+      wakeLockEnabled = false;
+      showToast('⚠️ Could not acquire wake lock');
+    }
+  } else {
+    await releaseWakeLock();
+    localStorage.setItem('hp_wakelock', '0');
+    updateWakeLockUI(false);
+    showToast('🌙 Screen sleep re-enabled');
+  }
+}
+
+function updateWakeLockUI(active) {
+  const btn = document.getElementById('wakelock-btn');
+  const icon = document.getElementById('wl-icon');
+  const label = document.getElementById('wl-label');
+  if (!btn) return;
+  btn.classList.toggle('active', active);
+  icon.textContent = active ? '☀️' : '🌙';
+  label.textContent = active ? 'Awake' : 'Stay on';
+}
+
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'visible' && wakeLockEnabled && !wakeLock) {
+    await acquireWakeLock();
+  }
+});
+
+function initWakeLock() {
+  if (!wakeLockSupported()) {
+    const btn = document.getElementById('wakelock-btn');
+    if (btn) btn.style.display = 'none';
+    return;
+  }
+  const saved = localStorage.getItem('hp_wakelock');
+  if (saved === '1') {
+    wakeLockEnabled = true;
+    acquireWakeLock();
+    updateWakeLockUI(true);
+  }
 }
 
 // ══════════════════════════════════════════
@@ -1543,8 +5548,15 @@ window.addEventListener('load', () => {
   // Restore saved config into inputs
   const savedClient = localStorage.getItem('hp_client_id');
   const savedProject = localStorage.getItem('hp_project_id');
+  const savedYTKey = localStorage.getItem('hp_yt_api_key');
   if (savedClient) document.getElementById('client-id-input').value = savedClient;
   if (savedProject) document.getElementById('project-id-input').value = savedProject;
+  if (savedYTKey) document.getElementById('yt-api-key-input').value = savedYTKey;
+  const savedFinnhub = localStorage.getItem('hp_finnhub_key');
+  if (savedFinnhub) {
+    const fh = document.getElementById('finnhub-key-input');
+    if (fh) fh.value = savedFinnhub;
+  }
 
   // Handle OAuth redirect
   if (window.location.hash.includes('access_token')) {
@@ -1556,6 +5568,8 @@ window.addEventListener('load', () => {
   if (restoreSession()) {
     showToast('👋 Welcome back!');
   }
+
+  initWakeLock();
 });
 </script>
 </body>
