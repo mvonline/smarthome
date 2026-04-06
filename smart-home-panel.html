@@ -202,6 +202,60 @@
 
   .remember-row:hover .remember-label { color: var(--text); }
 
+  .oauth-redirect-hint {
+    text-align: left;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+
+  .oauth-redirect-label {
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .oauth-redirect-row {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+
+  .oauth-redirect-row code {
+    flex: 1;
+    min-width: 0;
+    font-family: 'DM Mono', ui-monospace, monospace;
+    font-size: 11px;
+    word-break: break-all;
+    color: var(--accent);
+    background: rgba(0, 0, 0, 0.2);
+    padding: 8px 10px;
+    border-radius: 6px;
+    display: block;
+  }
+
+  .oauth-copy-btn {
+    flex-shrink: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    align-self: center;
+  }
+
+  .oauth-copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+
   /* ── MAIN DASHBOARD ── */
   #dashboard { display: none; flex-direction: column; min-height: 100vh; }
 
@@ -2350,6 +2404,15 @@
       <span class="remember-label">Remember me on this device</span>
     </label>
 
+    <div class="oauth-redirect-hint" id="oauth-redirect-hint">
+      <div class="oauth-redirect-label">Google Cloud — Authorized redirect URIs</div>
+      <p style="margin:0 0 8px;font-size:12px;color:var(--muted)">Paste the <strong style="color:var(--text)">redirect URI</strong> below into your OAuth 2.0 Web client. Under <strong style="color:var(--text)">Authorized JavaScript origins</strong>, add only <code id="oauth-js-origin" style="font-size:11px;color:var(--accent)"></code> (no path).</p>
+      <div class="oauth-redirect-row">
+        <code id="oauth-redirect-uri"></code>
+        <button type="button" class="oauth-copy-btn" onclick="copyOAuthRedirectUri()">Copy</button>
+      </div>
+    </div>
+
     <button class="btn-google" onclick="startGoogleAuth()">
       <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#fff" d="M44.5 20H24v8h11.9C34.6 33.5 30 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.1 8 2.9l5.7-5.7C34 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.7-7.7 19.7-20 0-1.3-.1-2.7-.2-4z"/></svg>
       Sign in with Google
@@ -2700,6 +2763,20 @@ function getOAuthRedirectUri() {
   } catch (e) {
     return window.location.origin + window.location.pathname;
   }
+}
+
+function updateOAuthRedirectHint() {
+  const uriEl = document.getElementById('oauth-redirect-uri');
+  const originEl = document.getElementById('oauth-js-origin');
+  if (uriEl) uriEl.textContent = getOAuthRedirectUri();
+  if (originEl) originEl.textContent = window.location.origin;
+}
+
+function copyOAuthRedirectUri() {
+  const uri = getOAuthRedirectUri();
+  navigator.clipboard.writeText(uri).then(() => showToast('Redirect URI copied — paste in Google Cloud Console')).catch(() => {
+    showToast(uri);
+  });
 }
 
 // ══════════════════════════════════════════
@@ -5589,6 +5666,7 @@ window.addEventListener('load', () => {
   }
 
   initWakeLock();
+  updateOAuthRedirectHint();
 });
 </script>
 </body>

@@ -182,7 +182,16 @@ Add credentials for the **exact** URL you use in the browser.
   - `https://yourname.github.io/smarthome/`
   - Optionally also `https://yourname.github.io/smarthome/index.html` if you ever load that URL directly.
 
-If you see **`redirect_uri_mismatch`**: open **Google Cloud Console** → your **Web client** → **Authorized redirect URIs** and add the URI your app actually sends (must match **exactly**, including `/` at the end). After a recent update, the app normalizes to a **trailing slash** on project URLs (e.g. `https://user.github.io/repo/`). In the browser console on the login page you can run **`getOAuthRedirectUri()`** and paste that string into Google Cloud. You can list **several** redirect URIs (local + GitHub + custom domain).
+**Custom domain (e.g. `vafa.one`)** — In [Google Cloud Console](https://console.cloud.google.com/) → **APIs & Services** → **Credentials** → your **OAuth 2.0 Client ID** (Web application):
+
+| Field | Example value |
+|--------|-----------------|
+| **Authorized JavaScript origins** | `https://vafa.one` |
+| **Authorized redirect URIs** | `https://vafa.one/smarthome/` |
+
+Use **HTTPS** and the **exact** path (including trailing `/` if that is what the app sends). The login screen shows the precise **redirect URI** and a **Copy** button; you can also run **`getOAuthRedirectUri()`** in the browser console.
+
+If you see **`redirect_uri_mismatch`**, the redirect URI in the error (Google shows it in the message) must be added **character-for-character** under **Authorized redirect URIs**. You can register **several** URIs (GitHub URL, custom domain, `http://localhost:8080/`, etc.).
 
 ## Tablet / Kiosk Mode
 
