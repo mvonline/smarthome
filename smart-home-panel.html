@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Home Panel</title>
+
+<!--
+=============================================================
+  SETUP INSTRUCTIONS
+=============================================================
+  1. Go to https://console.cloud.google.com/
+     - Create a new project
+     - Enable "Smart Device Management API"
+     - Create OAuth 2.0 credentials (Web Application)
+     - Add your domain to "Authorized JavaScript origins"
+     - Add your domain to "Authorized redirect URIs"
+     - Copy your Client ID below
+
+  2. Go to https://console.nest.google.com/device-access
+     - Pay $5 one-time fee
+     - Create a project, link your OAuth client
+     - Copy the Project ID below
+
+  3. Replace the config values:
+=============================================================
+-->
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #0d0f14;
+    --surface: #161922;
+    --surface2: #1e2230;
+    --border: rgba(255,255,255,0.07);
+    --text: #f0f2f7;
+    --muted: #6b7280;
+    --accent: #4fffb0;
+    --accent2: #7b61ff;
+    --accent3: #ff6b6b;
+    --warm: #ffb347;
+    --on: #4fffb0;
+    --off: #2a2d3a;
+    --radius: 20px;
+    --radius-sm: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── AUTH SCREEN ── */
+  #auth-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: 32px;
+    padding: 40px;
+    background: radial-gradient(ellipse at 60% 20%, rgba(75,255,176,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 20% 80%, rgba(123,97,255,0.08) 0%, transparent 60%),
+                var(--bg);
+  }
+
+  .auth-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 48px;
+    letter-spacing: -2px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .auth-sub {
+    color: var(--muted);
+    font-size: 16px;
+    text-align: center;
+    max-width: 320px;
+    line-height: 1.6;
+  }
+
+  .auth-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 40px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .config-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: left;
+  }
+
+  .config-row label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .config-row input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'DM Mono', monospace, sans-serif;
+    font-size: 13px;
+    padding: 12px 16px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  .config-row input:focus { border-color: var(--accent); }
+  .config-row input::placeholder { color: var(--muted); }
+
+  .btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: var(--accent);
+    color: #0d1a10;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 16px 28px;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    transition: transform 0.15s, opacity 0.15s;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-google:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-google:active { transform: scale(0.97); }
+
+  .btn-demo {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .btn-demo:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  .remember-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .remember-row input[type="checkbox"] {
+    display: none;
+  }
+
+  .remember-check {
+    width: 20px; height: 20px;
+    border-radius: 6px;
+    border: 1.5px solid var(--border);
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .remember-check svg { opacity: 0; transition: opacity 0.2s; }
+  .remember-row input:checked + .remember-check { background: var(--accent); border-color: var(--accent); }
+  .remember-row input:checked + .remember-check svg { opacity: 1; }
+
+  .remember-label {
+    font-size: 13px;
+    color: var(--muted);
+    transition: color 0.2s;
+  }
+
+  .remember-row:hover .remember-label { color: var(--text); }
+
+  /* ── MAIN DASHBOARD ── */
+  #dashboard { display: none; flex-direction: column; min-height: 100vh; }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 32px 0;
+  }
+
+  .topbar-left h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 28px;
+    letter-spacing: -1px;
+  }
+
+  .topbar-left .greeting {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 2px;
+  }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .user-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    object-fit: cover;
+    cursor: pointer;
+  }
+
+  .user-avatar-placeholder {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .btn-signout {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-signout:hover { border-color: var(--accent3); color: var(--accent3); }
+
+  .btn-refresh {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 18px;
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .btn-refresh:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-refresh.spinning { animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── STATUS BAR ── */
+  .status-bar {
+    display: flex;
+    gap: 12px;
+    padding: 20px 32px 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .status-bar::-webkit-scrollbar { display: none; }
+
+  .stat-pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 8px 18px;
+    font-size: 13px;
+    white-space: nowrap;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .stat-pill .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 6px var(--accent);
+  }
+
+  .stat-pill .dot.warn { background: var(--warm); box-shadow: 0 0 6px var(--warm); }
+
+  /* ── ROOM TABS ── */
+  .room-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 24px 32px 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .room-tabs::-webkit-scrollbar { display: none; }
+
+  .room-tab {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 9px 18px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .room-tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #0d1a10;
+    font-weight: 700;
+  }
+
+  /* ── DEVICE GRID ── */
+  .device-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    padding: 24px 32px 40px;
+  }
+
+  .device-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  .device-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    border-radius: var(--radius);
+  }
+
+  .device-card.on::before { opacity: 0.04; }
+  .device-card.on { border-color: rgba(79,255,176,0.2); }
+
+  .device-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+  .device-card:active { transform: scale(0.97); }
+
+  .device-icon {
+    font-size: 28px;
+    margin-bottom: 14px;
+    display: block;
+    filter: grayscale(0.3);
+  }
+
+  .device-card.on .device-icon { filter: none; }
+
+  .device-name {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .device-room {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  .device-status-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .device-status {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+
+  .device-card.on .device-status { color: var(--accent); }
+
+  .toggle {
+    width: 40px; height: 22px;
+    background: var(--off);
+    border-radius: 100px;
+    position: relative;
+    transition: background 0.25s;
+    flex-shrink: 0;
+  }
+
+  .device-card.on .toggle { background: var(--accent); }
+
+  .toggle::after {
+    content: '';
+    width: 16px; height: 16px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 3px; left: 3px;
+    transition: transform 0.25s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+
+  .device-card.on .toggle::after { transform: translateX(18px); }
+
+  /* Thermostat card extra */
+  .thermostat-temp {
+    font-family: 'Syne', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--warm);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .thermostat-mode {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  /* Brightness slider */
+  .brightness-row {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brightness-row input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(to right, var(--accent) var(--pct, 80%), var(--surface2) var(--pct, 80%));
+    border-radius: 10px;
+    outline: none;
+  }
+
+  .brightness-row input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 6px var(--accent);
+  }
+
+  .brightness-val {
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 28px;
+    text-align: right;
+  }
+
+  /* Color swatch on card */
+  .color-swatch {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.15);
+    flex-shrink: 0;
+    box-shadow: 0 0 8px var(--swatch-color, transparent);
+  }
+
+  /* ── COLOR WHEEL (modal) ── */
+  .color-wheel-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .color-wheel-container {
+    position: relative;
+    width: 200px; height: 200px;
+    cursor: crosshair;
+  }
+
+  .color-wheel-container canvas {
+    width: 200px; height: 200px;
+    border-radius: 50%;
+  }
+
+  .color-wheel-thumb {
+    position: absolute;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 0 6px rgba(0,0,0,0.5), inset 0 0 4px rgba(0,0,0,0.2);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    transition: box-shadow 0.15s;
+  }
+
+  .color-preview-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .color-preview-swatch {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    border: 2px solid rgba(255,255,255,0.15);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    transition: background 0.15s;
+  }
+
+  .color-preview-label {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .color-preview-label span {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* ── LOADING / EMPTY ── */
+  .loading-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    padding: 24px 32px 40px;
+  }
+
+  .skeleton {
+    background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--radius);
+    height: 160px;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .empty-state {
+    padding: 60px 32px;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-state h3 { font-family: 'Syne', sans-serif; font-size: 20px; margin-bottom: 8px; color: var(--text); }
+  .empty-state p { font-size: 14px; line-height: 1.6; max-width: 360px; margin: 0 auto 24px; }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed;
+    bottom: 32px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 12px 24px;
+    font-size: 13px;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 1000;
+    white-space: nowrap;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── DETAIL MODAL ── */
+  #modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 500;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  #modal-backdrop.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 28px 28px 0 0;
+    padding: 32px;
+    width: 100%;
+    max-width: 500px;
+    animation: slideUp 0.35s cubic-bezier(0.34,1.2,0.64,1);
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  .modal-handle {
+    width: 40px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto 24px;
+  }
+
+  .modal-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .modal-subtitle { color: var(--muted); font-size: 13px; margin-bottom: 28px; }
+
+  .modal-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .modal-row:last-child { border-bottom: none; }
+  .modal-row label { font-size: 14px; color: var(--muted); }
+  .modal-row .value { font-size: 14px; font-weight: 500; }
+
+  .modal-close {
+    background: var(--surface2);
+    border: none;
+    color: var(--muted);
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    font-size: 18px;
+    cursor: pointer;
+    float: right;
+    margin-top: -8px;
+  }
+
+  /* ── THERMOSTAT CONTROLS ── */
+  .temp-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    margin: 24px 0;
+  }
+
+  .temp-btn {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .temp-btn:hover { border-color: var(--warm); color: var(--warm); }
+  .temp-btn:active { transform: scale(0.9); }
+
+  .temp-display {
+    font-family: 'Syne', sans-serif;
+    font-size: 56px;
+    font-weight: 800;
+    color: var(--warm);
+    line-height: 1;
+    min-width: 120px;
+    text-align: center;
+  }
+
+  @media (max-width: 600px) {
+    .topbar { padding: 24px 20px 0; }
+    .status-bar, .room-tabs { padding-left: 20px; padding-right: 20px; }
+    .device-grid, .loading-grid { padding: 20px; gap: 12px; }
+    .device-grid { grid-template-columns: 1fr 1fr; }
+    .topbar-left h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ AUTH SCREEN ══ -->
+<div id="auth-screen">
+  <div class="auth-logo">⌂ HomePanel</div>
+  <p class="auth-sub">Your smart home, your design. Connect with Google to get started.</p>
+
+  <div class="auth-card">
+    <div class="config-row">
+      <label>Google OAuth Client ID</label>
+      <input type="text" id="client-id-input" placeholder="xxxx.apps.googleusercontent.com">
+    </div>
+    <div class="config-row">
+      <label>SDM Project ID</label>
+      <input type="text" id="project-id-input" placeholder="your-sdm-project-id">
+    </div>
+
+    <label class="remember-row">
+      <input type="checkbox" id="remember-me" checked>
+      <div class="remember-check">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="#0d1a10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <span class="remember-label">Remember me on this device</span>
+    </label>
+
+    <button class="btn-google" onclick="startGoogleAuth()">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#fff" d="M44.5 20H24v8h11.9C34.6 33.5 30 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.1 8 2.9l5.7-5.7C34 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.7-7.7 19.7-20 0-1.3-.1-2.7-.2-4z"/></svg>
+      Sign in with Google
+    </button>
+
+    <button class="btn-demo" onclick="loadDemoMode()">🎭 Try Demo Mode (no Google needed)</button>
+  </div>
+</div>
+
+<!-- ══ DASHBOARD ══ -->
+<div id="dashboard">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1 id="greeting-text">Good morning</h1>
+      <div class="greeting" id="user-email">Loading...</div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn-refresh" id="refresh-btn" onclick="refreshDevices()" title="Refresh">↻</button>
+      <div class="user-avatar-placeholder" id="user-avatar">👤</div>
+      <button class="btn-signout" onclick="signOut()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="status-bar" id="status-bar">
+    <div class="stat-pill"><div class="dot"></div><span id="stat-online">0 devices online</span></div>
+    <div class="stat-pill"><div class="dot warn"></div><span id="stat-time">--:--</span></div>
+    <div class="stat-pill">🌡️ <span id="stat-temp">--°</span></div>
+  </div>
+
+  <div class="room-tabs" id="room-tabs">
+    <button class="room-tab active" data-room="all" onclick="filterRoom('all', this)">All Rooms</button>
+  </div>
+
+  <div id="device-area"></div>
+</div>
+
+<div id="toast"></div>
+
+<div id="modal-backdrop" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  CONFIG — fill these in or use the UI above
+// ══════════════════════════════════════════
+const CONFIG = {
+  CLIENT_ID: '',
+  PROJECT_ID: '',
+  SCOPES: 'https://www.googleapis.com/auth/sdm.service email profile openid',
+  REDIRECT_URI: window.location.origin + window.location.pathname,
+};
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+let accessToken = null;
+let devices = [];
+let currentRoom = 'all';
+let isDemo = false;
+
+// ══════════════════════════════════════════
+//  GREETING
+// ══════════════════════════════════════════
+function updateGreeting() {
+  const h = new Date().getHours();
+  const g = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('greeting-text').textContent = g;
+  document.getElementById('stat-time').textContent = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+}
+setInterval(updateGreeting, 10000);
+updateGreeting();
+
+// ══════════════════════════════════════════
+//  AUTH
+// ══════════════════════════════════════════
+function isRememberMe() {
+  return document.getElementById('remember-me').checked;
+}
+
+function saveSession(token, expiresIn) {
+  if (!isRememberMe()) return;
+  const expiresAt = Date.now() + (expiresIn ? parseInt(expiresIn) * 1000 : 3600000);
+  localStorage.setItem('hp_session', JSON.stringify({
+    token,
+    expiresAt,
+    isDemo: false,
+  }));
+}
+
+function saveDemoSession() {
+  if (!isRememberMe()) return;
+  localStorage.setItem('hp_session', JSON.stringify({
+    token: null,
+    expiresAt: null,
+    isDemo: true,
+  }));
+}
+
+function clearSession() {
+  localStorage.removeItem('hp_session');
+}
+
+function restoreSession() {
+  const raw = localStorage.getItem('hp_session');
+  if (!raw) return false;
+  try {
+    const session = JSON.parse(raw);
+    if (session.isDemo) {
+      isDemo = true;
+      showDashboard();
+      document.getElementById('user-email').textContent = 'demo@home.local';
+      loadDemoDevices();
+      return true;
+    }
+    if (session.token && session.expiresAt > Date.now()) {
+      accessToken = session.token;
+      CONFIG.CLIENT_ID = localStorage.getItem('hp_client_id') || CONFIG.CLIENT_ID;
+      CONFIG.PROJECT_ID = localStorage.getItem('hp_project_id') || CONFIG.PROJECT_ID;
+      showDashboard();
+      loadUserInfo();
+      loadDevices();
+      return true;
+    }
+    clearSession();
+  } catch (e) {
+    clearSession();
+  }
+  return false;
+}
+
+function startGoogleAuth() {
+  const clientId = document.getElementById('client-id-input').value.trim() || CONFIG.CLIENT_ID;
+  const projectId = document.getElementById('project-id-input').value.trim() || CONFIG.PROJECT_ID;
+
+  if (!clientId) { showToast('⚠️ Please enter your Client ID'); return; }
+  if (!projectId) { showToast('⚠️ Please enter your SDM Project ID'); return; }
+
+  CONFIG.CLIENT_ID = clientId;
+  CONFIG.PROJECT_ID = projectId;
+  localStorage.setItem('hp_client_id', clientId);
+  localStorage.setItem('hp_project_id', projectId);
+  localStorage.setItem('hp_remember', isRememberMe() ? '1' : '0');
+
+  const params = new URLSearchParams({
+    client_id: clientId,
+    redirect_uri: CONFIG.REDIRECT_URI,
+    response_type: 'token',
+    scope: CONFIG.SCOPES,
+    prompt: 'select_account',
+  });
+
+  window.location.href = 'https://accounts.google.com/o/oauth2/v2/auth?' + params;
+}
+
+function handleOAuthCallback() {
+  const hash = window.location.hash.substring(1);
+  const params = new URLSearchParams(hash);
+  const token = params.get('access_token');
+  const expiresIn = params.get('expires_in');
+  if (token) {
+    accessToken = token;
+    history.replaceState(null, '', window.location.pathname);
+    CONFIG.CLIENT_ID = localStorage.getItem('hp_client_id') || CONFIG.CLIENT_ID;
+    CONFIG.PROJECT_ID = localStorage.getItem('hp_project_id') || CONFIG.PROJECT_ID;
+
+    if (localStorage.getItem('hp_remember') === '1') {
+      const expiresAt = Date.now() + (expiresIn ? parseInt(expiresIn) * 1000 : 3600000);
+      localStorage.setItem('hp_session', JSON.stringify({
+        token,
+        expiresAt,
+        isDemo: false,
+      }));
+    }
+
+    showDashboard();
+    loadUserInfo();
+    loadDevices();
+  }
+}
+
+function signOut() {
+  accessToken = null;
+  isDemo = false;
+  devices = [];
+  clearSession();
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('dashboard').style.display = 'none';
+  showToast('👋 Signed out');
+}
+
+async function loadUserInfo() {
+  if (isDemo) {
+    document.getElementById('user-email').textContent = 'demo@home.local';
+    return;
+  }
+  try {
+    const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: 'Bearer ' + accessToken }
+    });
+    const u = await r.json();
+    document.getElementById('user-email').textContent = u.email || '';
+    if (u.picture) {
+      const av = document.getElementById('user-avatar');
+      av.innerHTML = `<img class="user-avatar" src="${u.picture}" alt="avatar">`;
+    }
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════════
+//  DASHBOARD
+// ══════════════════════════════════════════
+function showDashboard() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'flex';
+  document.getElementById('dashboard').style.flexDirection = 'column';
+}
+
+// ══════════════════════════════════════════
+//  LOAD DEVICES — Google SDM API
+// ══════════════════════════════════════════
+async function loadDevices() {
+  if (isDemo) { loadDemoDevices(); return; }
+  showLoadingSkeleton();
+
+  try {
+    const r = await fetch(
+      `https://smartdevicemanagement.googleapis.com/v1/enterprises/${CONFIG.PROJECT_ID}/devices`,
+      { headers: { Authorization: 'Bearer ' + accessToken } }
+    );
+    if (!r.ok) throw new Error('API error ' + r.status);
+    const data = await r.json();
+    devices = parseSDMDevices(data.devices || []);
+    renderAll();
+  } catch(e) {
+    console.error(e);
+    showError(e.message);
+  }
+}
+
+function parseSDMDevices(raw) {
+  return raw.map(d => {
+    const traits = d.traits || {};
+    const info = traits['sdm.devices.traits.Info'] || {};
+    const conn = traits['sdm.devices.traits.Connectivity'] || {};
+    const onOff = traits['sdm.devices.traits.OnOff'] || {};
+    const brightness = traits['sdm.devices.traits.Brightness'] || {};
+    const temp = traits['sdm.devices.traits.Temperature'] || {};
+    const thermostat = traits['sdm.devices.traits.ThermostatTemperatureSetpoint'] || {};
+    const hvac = traits['sdm.devices.traits.ThermostatHvac'] || {};
+    const mode = traits['sdm.devices.traits.ThermostatMode'] || {};
+    const humidity = traits['sdm.devices.traits.Humidity'] || {};
+    const colorSetting = traits['sdm.devices.traits.ColorSetting'] || null;
+
+    let colorHsv = null;
+    if (colorSetting) {
+      const spectrumHsv = colorSetting.color?.spectrumHsv ||
+                          colorSetting.spectrumHsv || null;
+      if (spectrumHsv) {
+        colorHsv = {
+          hue: spectrumHsv.hue || 0,
+          saturation: spectrumHsv.saturation || 0,
+          value: spectrumHsv.value || 1,
+        };
+      }
+    }
+
+    const type = d.type || '';
+    let kind = 'switch';
+    if (type.includes('THERMOSTAT')) kind = 'thermostat';
+    else if (type.includes('LIGHT')) kind = 'light';
+    else if (type.includes('CAMERA')) kind = 'camera';
+    else if (type.includes('DOORBELL')) kind = 'doorbell';
+    else if (type.includes('DISPLAY')) kind = 'display';
+
+    const parentRelations = d.parentRelations || [];
+    const room = parentRelations.length > 0
+      ? (parentRelations[0].displayName || 'Home')
+      : 'Home';
+
+    return {
+      id: d.name,
+      name: info.customName || d.displayName || 'Device',
+      kind,
+      room,
+      online: conn.status === 'ONLINE',
+      on: onOff.on !== undefined ? onOff.on : true,
+      brightness: brightness.brightness || null,
+      colorHsv,
+      temperature: temp.ambientTemperatureCelsius || null,
+      setpoint: thermostat.heatCelsius || thermostat.coolCelsius || null,
+      hvacStatus: hvac.status || '',
+      thermostatMode: mode.mode || '',
+      humidity: humidity.ambientHumidityPercent || null,
+      raw: d,
+    };
+  });
+}
+
+// ══════════════════════════════════════════
+//  CONTROL — execute command
+// ══════════════════════════════════════════
+async function executeCommand(deviceId, command, params) {
+  if (isDemo) {
+    const d = devices.find(x => x.id === deviceId);
+    if (!d) return;
+    if (command.includes('OnOff')) d.on = params.on;
+    if (command.includes('Brightness')) d.brightness = params.brightness;
+    if (command.includes('ThermostatTemperatureSetpoint')) {
+      d.setpoint = params.heatCelsius || params.coolCelsius || d.setpoint;
+    }
+    if (command.includes('ColorSetting')) {
+      const hsv = params.color?.spectrumHsv;
+      if (hsv) d.colorHsv = { hue: hsv.hue, saturation: hsv.saturation, value: hsv.value };
+    }
+    renderAll();
+    return;
+  }
+
+  try {
+    const r = await fetch(
+      `https://smartdevicemanagement.googleapis.com/v1/${deviceId}:executeCommand`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer ' + accessToken,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ command, params }),
+      }
+    );
+    if (!r.ok) throw new Error('Command failed ' + r.status);
+    showToast('✓ Command sent');
+    setTimeout(loadDevices, 1200);
+  } catch(e) {
+    showToast('✗ ' + e.message);
+  }
+}
+
+// ══════════════════════════════════════════
+//  TOGGLE DEVICE
+// ══════════════════════════════════════════
+function toggleDevice(id, e) {
+  e.stopPropagation();
+  const d = devices.find(x => x.id === id);
+  if (!d) return;
+  const newOn = !d.on;
+  d.on = newOn; // optimistic
+  renderAll();
+  executeCommand(id, 'sdm.devices.commands.OnOff.Set', { on: newOn });
+  showToast(newOn ? '💡 Turned on' : '🌑 Turned off');
+}
+
+// ══════════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════════
+function renderAll() {
+  buildRoomTabs();
+  renderDevices();
+  updateStats();
+}
+
+function buildRoomTabs() {
+  const rooms = ['all', ...new Set(devices.map(d => d.room))];
+  const tabs = document.getElementById('room-tabs');
+  tabs.innerHTML = rooms.map(r =>
+    `<button class="room-tab ${r === currentRoom ? 'active' : ''}"
+       data-room="${r}"
+       onclick="filterRoom('${r}', this)">
+       ${r === 'all' ? 'All Rooms' : r}
+     </button>`
+  ).join('');
+}
+
+function filterRoom(room, el) {
+  currentRoom = room;
+  document.querySelectorAll('.room-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderDevices();
+}
+
+function renderDevices() {
+  const filtered = currentRoom === 'all' ? devices : devices.filter(d => d.room === currentRoom);
+  const area = document.getElementById('device-area');
+
+  if (filtered.length === 0) {
+    area.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">🏠</div>
+        <h3>No devices found</h3>
+        <p>No devices in this room. Make sure your Google Home devices are set up and linked to your account.</p>
+      </div>`;
+    return;
+  }
+
+  area.innerHTML = `<div class="device-grid">${filtered.map(deviceCard).join('')}</div>`;
+}
+
+function deviceIcon(kind) {
+  return { light: '💡', thermostat: '🌡️', camera: '📷', doorbell: '🔔', display: '📺', switch: '🔌' }[kind] || '📱';
+}
+
+function deviceCard(d) {
+  if (d.kind === 'thermostat') return thermostatCard(d);
+  if (d.kind === 'light') return lightCard(d);
+  return switchCard(d);
+}
+
+function switchCard(d) {
+  return `
+    <div class="device-card ${d.on ? 'on' : ''}" onclick="openModal('${d.id}')">
+      <span class="device-icon">${deviceIcon(d.kind)}</span>
+      <div class="device-name">${d.name}</div>
+      <div class="device-room">${d.room}</div>
+      <div class="device-status-row">
+        <span class="device-status">${d.on ? 'On' : 'Off'}</span>
+        <div class="toggle" onclick="toggleDevice('${d.id}', event)"></div>
+      </div>
+    </div>`;
+}
+
+function lightCard(d) {
+  const pct = d.brightness !== null ? d.brightness : 80;
+  const cssColor = d.colorHsv ? hsvToHex(d.colorHsv.hue, d.colorHsv.saturation, d.colorHsv.value) : null;
+  return `
+    <div class="device-card ${d.on ? 'on' : ''}" onclick="openModal('${d.id}')">
+      <span class="device-icon">💡</span>
+      <div class="device-name">${d.name}</div>
+      <div class="device-room">${d.room}</div>
+      <div class="device-status-row">
+        <span class="device-status">${d.on ? 'On' : 'Off'}</span>
+        ${d.colorHsv ? `<div class="color-swatch" style="background:${cssColor};--swatch-color:${cssColor}"></div>` : ''}
+        <div class="toggle" onclick="toggleDevice('${d.id}', event)"></div>
+      </div>
+      ${d.brightness !== null ? `
+      <div class="brightness-row" onclick="event.stopPropagation()">
+        <input type="range" min="0" max="100" value="${pct}"
+          style="--pct:${pct}%"
+          oninput="this.style.setProperty('--pct',this.value+'%')"
+          onchange="setBrightness('${d.id}', this.value)">
+        <span class="brightness-val">${pct}%</span>
+      </div>` : ''}
+    </div>`;
+}
+
+function thermostatCard(d) {
+  const temp = d.temperature !== null ? d.temperature.toFixed(1) + '°' : '--°';
+  const setpoint = d.setpoint !== null ? d.setpoint.toFixed(1) + '°' : '--°';
+  return `
+    <div class="device-card on" onclick="openModal('${d.id}')">
+      <span class="device-icon">🌡️</span>
+      <div class="device-name">${d.name}</div>
+      <div class="device-room">${d.room}</div>
+      <div class="thermostat-temp">${temp}</div>
+      <div class="thermostat-mode">${d.hvacStatus || d.thermostatMode || 'Thermostat'} · Set ${setpoint}</div>
+      ${d.humidity !== null ? `<div class="device-status">💧 ${d.humidity}% humidity</div>` : ''}
+    </div>`;
+}
+
+function updateStats() {
+  const online = devices.filter(d => d.online).length;
+  document.getElementById('stat-online').textContent = `${online} device${online !== 1 ? 's' : ''} online`;
+  const thermos = devices.filter(d => d.kind === 'thermostat' && d.temperature !== null);
+  if (thermos.length) {
+    document.getElementById('stat-temp').textContent = thermos[0].temperature.toFixed(1) + '°C';
+  }
+}
+
+// ══════════════════════════════════════════
+//  BRIGHTNESS
+// ══════════════════════════════════════════
+function setBrightness(id, val) {
+  const d = devices.find(x => x.id === id);
+  if (d) d.brightness = parseInt(val);
+  executeCommand(id, 'sdm.devices.commands.Brightness.SetBrightness', { brightness: parseInt(val) });
+}
+
+// ══════════════════════════════════════════
+//  COLOR UTILITIES
+// ══════════════════════════════════════════
+function hsvToRgb(h, s, v) {
+  h = ((h % 360) + 360) % 360;
+  const c = v * s;
+  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+  const m = v - c;
+  let r, g, b;
+  if (h < 60)       { r = c; g = x; b = 0; }
+  else if (h < 120) { r = x; g = c; b = 0; }
+  else if (h < 180) { r = 0; g = c; b = x; }
+  else if (h < 240) { r = 0; g = x; b = c; }
+  else if (h < 300) { r = x; g = 0; b = c; }
+  else              { r = c; g = 0; b = x; }
+  return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)];
+}
+
+function hsvToHex(h, s, v) {
+  const [r, g, b] = hsvToRgb(h, s, v);
+  return '#' + [r, g, b].map(c => c.toString(16).padStart(2, '0')).join('');
+}
+
+// ══════════════════════════════════════════
+//  COLOR WHEEL
+// ══════════════════════════════════════════
+let _colorWheelDeviceId = null;
+let _colorWheelDragging = false;
+
+function drawColorWheel(canvas) {
+  const size = 400;
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const cx = size / 2, cy = size / 2, radius = size / 2;
+  const imageData = ctx.createImageData(size, size);
+
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const dx = x - cx, dy = y - cy;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const i = (y * size + x) * 4;
+      if (dist <= radius) {
+        const hue = (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
+        const sat = dist / radius;
+        const [r, g, b] = hsvToRgb(hue, sat, 1);
+        imageData.data[i] = r;
+        imageData.data[i + 1] = g;
+        imageData.data[i + 2] = b;
+        imageData.data[i + 3] = 255;
+      } else {
+        imageData.data[i + 3] = 0;
+      }
+    }
+  }
+  ctx.putImageData(imageData, 0, 0);
+}
+
+function positionColorThumb(container, hue, saturation) {
+  const thumb = container.querySelector('.color-wheel-thumb');
+  if (!thumb) return;
+  const rect = container.getBoundingClientRect();
+  const cx = rect.width / 2, cy = rect.height / 2;
+  const radius = cx;
+  const angle = hue * Math.PI / 180;
+  const dist = saturation * radius;
+  const x = cx + dist * Math.cos(angle);
+  const y = cy + dist * Math.sin(angle);
+  thumb.style.left = x + 'px';
+  thumb.style.top = y + 'px';
+  const hex = hsvToHex(hue, saturation, 1);
+  thumb.style.background = hex;
+}
+
+function handleColorWheelInput(e, container) {
+  const rect = container.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  const x = clientX - rect.left;
+  const y = clientY - rect.top;
+  const cx = rect.width / 2, cy = rect.height / 2;
+  const dx = x - cx, dy = y - cy;
+  const radius = cx;
+  let dist = Math.sqrt(dx * dx + dy * dy);
+  if (dist > radius) dist = radius;
+
+  const hue = ((Math.atan2(dy, dx) * 180 / Math.PI) + 360) % 360;
+  const saturation = Math.min(dist / radius, 1);
+
+  positionColorThumb(container, hue, saturation);
+
+  const hex = hsvToHex(hue, saturation, 1);
+  const previewEl = document.getElementById('color-preview-swatch');
+  const labelEl = document.getElementById('color-preview-hex');
+  if (previewEl) previewEl.style.background = hex;
+  if (labelEl) labelEl.textContent = hex.toUpperCase();
+
+  return { hue: Math.round(hue), saturation: parseFloat(saturation.toFixed(3)) };
+}
+
+function initColorWheel(deviceId) {
+  _colorWheelDeviceId = deviceId;
+  const container = document.getElementById('color-wheel-container');
+  const canvas = container.querySelector('canvas');
+  if (!canvas) return;
+
+  drawColorWheel(canvas);
+
+  const d = devices.find(x => x.id === deviceId);
+  if (d && d.colorHsv) {
+    positionColorThumb(container, d.colorHsv.hue, d.colorHsv.saturation);
+  } else {
+    positionColorThumb(container, 0, 0);
+  }
+
+  let debounceTimer = null;
+
+  function onMove(e) {
+    if (!_colorWheelDragging) return;
+    e.preventDefault();
+    const hsv = handleColorWheelInput(e, container);
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => applyColor(deviceId, hsv.hue, hsv.saturation), 300);
+  }
+
+  function onEnd() {
+    _colorWheelDragging = false;
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onEnd);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onEnd);
+  }
+
+  function onStart(e) {
+    _colorWheelDragging = true;
+    const hsv = handleColorWheelInput(e, container);
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => applyColor(deviceId, hsv.hue, hsv.saturation), 300);
+    document.addEventListener('mousemove', onMove, { passive: false });
+    document.addEventListener('mouseup', onEnd);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('touchend', onEnd);
+  }
+
+  container.addEventListener('mousedown', onStart);
+  container.addEventListener('touchstart', onStart, { passive: false });
+}
+
+function applyColor(deviceId, hue, saturation) {
+  const d = devices.find(x => x.id === deviceId);
+  if (!d) return;
+  const value = d.colorHsv ? d.colorHsv.value : 1;
+  d.colorHsv = { hue, saturation, value };
+  executeCommand(deviceId, 'sdm.devices.commands.ColorSetting.SetColor', {
+    color: { spectrumHsv: { hue, saturation, value } }
+  });
+}
+
+// ══════════════════════════════════════════
+//  MODAL
+// ══════════════════════════════════════════
+function openModal(id) {
+  const d = devices.find(x => x.id === id);
+  if (!d) return;
+  const modal = document.getElementById('modal-content');
+
+  let extra = '';
+  if (d.kind === 'thermostat') {
+    const sp = d.setpoint || 20;
+    extra = `
+      <div class="temp-control">
+        <button class="temp-btn" onclick="adjustTemp('${id}', -0.5)">−</button>
+        <div class="temp-display" id="modal-temp">${sp.toFixed(1)}°</div>
+        <button class="temp-btn" onclick="adjustTemp('${id}', 0.5)">+</button>
+      </div>
+      <div class="modal-row">
+        <label>Current temperature</label>
+        <span class="value">${d.temperature !== null ? d.temperature.toFixed(1) + '°C' : '--'}</span>
+      </div>
+      <div class="modal-row">
+        <label>Mode</label>
+        <span class="value">${d.thermostatMode || '--'}</span>
+      </div>
+      <div class="modal-row">
+        <label>HVAC status</label>
+        <span class="value">${d.hvacStatus || '--'}</span>
+      </div>
+      ${d.humidity !== null ? `<div class="modal-row"><label>Humidity</label><span class="value">${d.humidity}%</span></div>` : ''}
+    `;
+  } else {
+    const currentHex = d.colorHsv ? hsvToHex(d.colorHsv.hue, d.colorHsv.saturation, d.colorHsv.value) : '#ffffff';
+    const colorWheelHtml = d.colorHsv ? `
+      <div class="color-wheel-wrap">
+        <div class="color-wheel-container" id="color-wheel-container">
+          <canvas></canvas>
+          <div class="color-wheel-thumb" style="background:${currentHex}"></div>
+        </div>
+        <div class="color-preview-row">
+          <div class="color-preview-swatch" id="color-preview-swatch" style="background:${currentHex}"></div>
+          <div class="color-preview-label">Current: <span id="color-preview-hex">${currentHex.toUpperCase()}</span></div>
+        </div>
+      </div>
+    ` : '';
+
+    extra = `
+      <div class="modal-row">
+        <label>Status</label>
+        <span class="value">${d.on ? 'On' : 'Off'}</span>
+      </div>
+      <div class="modal-row">
+        <label>Room</label>
+        <span class="value">${d.room}</span>
+      </div>
+      <div class="modal-row">
+        <label>Connectivity</label>
+        <span class="value">${d.online ? '🟢 Online' : '🔴 Offline'}</span>
+      </div>
+      ${d.brightness !== null ? `<div class="modal-row"><label>Brightness</label><span class="value">${d.brightness}%</span></div>` : ''}
+      ${colorWheelHtml}
+    `;
+  }
+
+  modal.innerHTML = `
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title">${d.name}</div>
+    <div class="modal-subtitle">${d.room} · ${d.kind}</div>
+    ${extra}
+  `;
+  document.getElementById('modal-backdrop').classList.add('open');
+
+  if (d.colorHsv && document.getElementById('color-wheel-container')) {
+    requestAnimationFrame(() => initColorWheel(id));
+  }
+}
+
+let _modalTempVal = null;
+let _modalTempId = null;
+
+function adjustTemp(id, delta) {
+  const d = devices.find(x => x.id === id);
+  if (!d) return;
+  d.setpoint = (d.setpoint || 20) + delta;
+  _modalTempVal = d.setpoint;
+  _modalTempId = id;
+  const el = document.getElementById('modal-temp');
+  if (el) el.textContent = d.setpoint.toFixed(1) + '°';
+  executeCommand(id, 'sdm.devices.commands.ThermostatTemperatureSetpoint.SetHeat',
+    { heatCelsius: d.setpoint });
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modal-backdrop')) return;
+  document.getElementById('modal-backdrop').classList.remove('open');
+}
+
+// ══════════════════════════════════════════
+//  SKELETON + REFRESH
+// ══════════════════════════════════════════
+function showLoadingSkeleton() {
+  document.getElementById('device-area').innerHTML = `
+    <div class="loading-grid">
+      ${Array(6).fill('<div class="skeleton"></div>').join('')}
+    </div>`;
+}
+
+function showError(msg) {
+  document.getElementById('device-area').innerHTML = `
+    <div class="empty-state">
+      <div class="icon">⚠️</div>
+      <h3>Could not load devices</h3>
+      <p>${msg}</p>
+      <button class="btn-demo" onclick="loadDemoMode()" style="margin:0 auto;display:block">Try Demo Mode instead</button>
+    </div>`;
+}
+
+function refreshDevices() {
+  const btn = document.getElementById('refresh-btn');
+  btn.classList.add('spinning');
+  loadDevices().finally
+    ? loadDevices().finally(() => setTimeout(() => btn.classList.remove('spinning'), 600))
+    : (loadDevices(), setTimeout(() => btn.classList.remove('spinning'), 1200));
+}
+
+// ══════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ══════════════════════════════════════════
+//  DEMO MODE
+// ══════════════════════════════════════════
+function loadDemoMode() {
+  isDemo = true;
+  saveDemoSession();
+  showDashboard();
+  document.getElementById('user-email').textContent = 'demo@home.local';
+  loadDemoDevices();
+}
+
+function loadDemoDevices() {
+  devices = [
+    { id: 'd1', name: 'Living Room Light', kind: 'light', room: 'Living Room', online: true, on: true, brightness: 80, colorHsv: { hue: 30, saturation: 0.8, value: 1 } },
+    { id: 'd2', name: 'Kitchen Light', kind: 'light', room: 'Kitchen', online: true, on: false, brightness: 60, colorHsv: null },
+    { id: 'd3', name: 'Hallway Light', kind: 'light', room: 'Hallway', online: true, on: true, brightness: 40, colorHsv: null },
+    { id: 'd4', name: 'Nest Thermostat', kind: 'thermostat', room: 'Living Room', online: true, on: true, temperature: 21.5, setpoint: 22.0, hvacStatus: 'HEATING', thermostatMode: 'HEAT', humidity: 45 },
+    { id: 'd5', name: 'Bedroom Light', kind: 'light', room: 'Bedroom', online: true, on: false, brightness: 100, colorHsv: { hue: 240, saturation: 0.6, value: 1 } },
+    { id: 'd6', name: 'TV', kind: 'switch', room: 'Living Room', online: true, on: true, brightness: null },
+    { id: 'd7', name: 'Front Door Camera', kind: 'camera', room: 'Entrance', online: true, on: true, brightness: null },
+    { id: 'd8', name: 'Coffee Maker', kind: 'switch', room: 'Kitchen', online: false, on: false, brightness: null },
+    { id: 'd9', name: 'Bathroom Light', kind: 'light', room: 'Bathroom', online: true, on: false, brightness: 70, colorHsv: { hue: 160, saturation: 0.5, value: 1 } },
+    { id: 'd10', name: 'Doorbell', kind: 'doorbell', room: 'Entrance', online: true, on: true, brightness: null },
+  ];
+  renderAll();
+  showToast('🎭 Demo mode — changes won\'t affect real devices');
+}
+
+// ══════════════════════════════════════════
+//  BOOT
+// ══════════════════════════════════════════
+window.addEventListener('load', () => {
+  // Restore saved config into inputs
+  const savedClient = localStorage.getItem('hp_client_id');
+  const savedProject = localStorage.getItem('hp_project_id');
+  if (savedClient) document.getElementById('client-id-input').value = savedClient;
+  if (savedProject) document.getElementById('project-id-input').value = savedProject;
+
+  // Handle OAuth redirect
+  if (window.location.hash.includes('access_token')) {
+    handleOAuthCallback();
+    return;
+  }
+
+  // Restore remembered session
+  if (restoreSession()) {
+    showToast('👋 Welcome back!');
+  }
+});
+</script>
+</body>
+</html>
