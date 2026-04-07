@@ -149,6 +149,10 @@ This appears because the OAuth client uses **sensitive scopes** (Smart Home, Cal
 
 **“Could not load devices” / API 404** — The list-devices URL is `.../enterprises/{Project ID}/devices`. A **404** almost always means the **SDM Project ID** in the panel does not match the Device Access project, or the OAuth client is not linked there. Open the [Device Access Console](https://console.nest.google.com/device-access), copy the **Project ID** exactly, and paste only that string (not `enterprises/...` — the app strips that prefix if present). Sign out, update the field, sign in again.
 
+**“No devices” while Google Home shows rooms** — The Home app lists every device linked to your account. This panel only shows devices returned by the **Smart Device Management (SDM)** API (Nest / Device Access–supported hardware). Many third‑party or non‑Nest devices never appear in SDM. If you do see devices under **All Rooms** but not under a specific tab, use **All Rooms** — room names come from the API and the previous room filter resets when you reload.
+
+**Two or more Google Home “homes”** — The panel loads SDM [structures](https://developers.google.com/nest/device-access/reference/rest/v1/enterprises.structures/list) (each matches a home in the Home app) and adds a **🏠** control to choose **All homes** or one home. Your choice is remembered in the browser (`localStorage`). If one home has no Nest/SDM devices, pick another home or **All homes** so you are not filtering to an empty structure.
+
 ### Step 3 — YouTube API key (optional)
 
 If you prefer **search without** using OAuth quota, or need search when not signed in:
@@ -164,7 +168,7 @@ Signed-in users can search without this key (uses OAuth).
 2. Paste your **Client ID** and **SDM Project ID**
 3. Optional: check **Remember me**
 4. **Sign in with Google** and accept all requested permissions
-5. Use **Devices**, **Media** (including **Subscriptions**), **Calendar**, **Weather**, **World Clock**, **Markets**, and **Photos** (screen saver)
+5. Use **Devices** (if you have more than one Google Home / location, use the **🏠** menu in the status bar to pick **All homes** or one home), **Media** (including **Subscriptions**), **Calendar**, **Weather**, **World Clock**, **Markets**, and **Photos** (screen saver)
 
 ## GitHub Pages
 
