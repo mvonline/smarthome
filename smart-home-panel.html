@@ -3498,8 +3498,15 @@ function renderDevices() {
       <div class="empty-state">
         <div class="icon">🏠</div>
         <h3>No devices from the API</h3>
-        <p style="max-width:480px;margin:0 auto">The <strong>Google Home</strong> app can show every speaker, TV, and third‑party gadget. This panel only lists devices exposed by the <strong>Nest Device Access</strong> (SDM) API — mainly Nest cameras, doorbells, thermostats, and supported partners. Devices that never appear in <a href="https://console.nest.google.com/device-access" target="_blank" rel="noopener">Device Access</a> will not show here.</p>
-        <p class="wc-hint" style="max-width:480px;margin:12px auto 0">If you expect Nest devices here, confirm they are on the same Google account and linked in the Device Access project.</p>
+        <p style="max-width:520px;margin:0 auto">If the browser console shows <strong>HTTP 200</strong> and a raw body of <code>{}</code> for both <code>structures</code> and <code>devices</code>, the app is working — Google is simply returning <strong>no homes and no SDM devices</strong> for the Google account you used at sign-in and your Device Access project.</p>
+        <p style="max-width:520px;margin:14px auto 0;text-align:left;font-size:14px;color:var(--muted);line-height:1.6">Checklist:</p>
+        <ul style="text-align:left;max-width:520px;margin:8px auto 0;font-size:14px;color:var(--muted);line-height:1.6">
+          <li><strong>Same Google account</strong> — Sign in here with the exact account that owns your homes in the Google Home app (not a workspace-only or secondary profile).</li>
+          <li><strong>SDM-supported hardware</strong> — The Home app lists many devices; this API only surfaces <strong>Nest / partner devices</strong> enrolled for Device Access (e.g. Nest thermostats, cameras, doorbells). Generic smart plugs and switches (e.g. <strong>Deltaco</strong> and similar brands) usually work in Home only — they are <strong>not</strong> exposed to SDM, so this panel cannot see them.</li>
+          <li><strong>OAuth client</strong> — The Client ID in this panel must match the one linked in the <a href="https://console.nest.google.com/device-access" target="_blank" rel="noopener">Device Access Console</a> for this Project ID.</li>
+          <li><strong>Fresh consent</strong> — Sign out of this panel, then sign in again and accept all prompts so access is granted to the right account.</li>
+        </ul>
+        <p class="wc-hint" style="max-width:520px;margin:16px auto 0">If your gear is only third‑party (e.g. Deltaco) and not Nest, an empty SDM list is <strong>expected</strong>. Use the Google Home app, Assistant routines, or the manufacturer’s app to control those devices.</p>
       </div>`;
     } else {
       area.innerHTML = `
