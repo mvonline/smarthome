@@ -1393,6 +1393,59 @@
 
   .cal-today-btn:hover { border-color: var(--accent); color: var(--accent); }
 
+  .cal-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .cal-sources-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    max-height: 280px;
+    overflow-y: auto;
+  }
+
+  .cal-sources-panel .cal-sources-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .cal-source-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    cursor: pointer;
+    line-height: 1.4;
+  }
+
+  .cal-source-row input { margin-top: 3px; flex-shrink: 0; }
+
+  .cal-source-row span { color: var(--text); }
+
+  .cal-sources-actions {
+    margin-top: 14px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .cal-event-cal {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+
   /* Mini calendar grid */
   .cal-grid {
     background: var(--surface);
@@ -2575,7 +2628,20 @@
           <div class="cal-month-title" id="cal-month-title"></div>
           <button class="cal-nav-btn" onclick="calNavigate(1)">▸</button>
         </div>
-        <button class="cal-today-btn" onclick="calGoToday()">Today</button>
+        <div class="cal-header-actions">
+          <button type="button" class="cal-today-btn" onclick="calToggleSourcesPanel()" id="cal-sources-btn">Calendars</button>
+          <button type="button" class="cal-today-btn" onclick="calGoToday()">Today</button>
+        </div>
+      </div>
+
+      <div id="cal-sources-panel" class="cal-sources-panel" style="display:none" aria-hidden="true">
+        <div class="cal-sources-title">Show events from (includes “Other calendars” in Google Calendar)</div>
+        <div id="cal-sources-list" class="wc-hint">Open Calendars to load your list…</div>
+        <div class="cal-sources-actions">
+          <button type="button" class="cal-today-btn" onclick="calSourcesSelectAll(true)">All</button>
+          <button type="button" class="cal-today-btn" onclick="calSourcesSelectAll(false)">None</button>
+          <button type="button" class="cal-today-btn" onclick="calApplySources()" style="border-color:var(--accent);color:var(--accent)">Apply</button>
+        </div>
       </div>
 
       <div class="cal-grid">
@@ -2996,6 +3062,7 @@ function handleOAuthCallback() {
   const expiresIn = params.get('expires_in');
   if (token) {
     accessToken = token;
+    calCalendarList = null;
     history.replaceState(null, '', window.location.pathname);
     CONFIG.CLIENT_ID = localStorage.getItem('hp_client_id') || CONFIG.CLIENT_ID;
     CONFIG.PROJECT_ID = normalizeSdmEnterpriseId(
@@ -3024,6 +3091,7 @@ function signOut() {
   accessToken = null;
   isDemo = false;
   devices = [];
+  calCalendarList = null;
   clearSession();
   stopScreensaver();
   stopCameraLive();
@@ -5381,6 +5449,8 @@ let calInitialized = false;
 let calViewDate = new Date();
 let calSelectedDate = new Date();
 let calEvents = [];
+/** Cached from GET calendar/v3/users/me/calendarList — includes “Other calendars”. */
+let calCalendarList = null;
 
 function initCalendar() {
   calInitialized = true;
@@ -5486,7 +5556,9 @@ function renderAgenda() {
   let html = `<div class="cal-agenda"><div class="cal-agenda-header">${dayLabel} <span class="day-label">${dayEvents.length} event${dayEvents.length > 1 ? 's' : ''}</span></div>`;
 
   allDay.forEach((ev, i) => {
+    const calLine = ev.calendarSummary ? `<div class="cal-event-cal">${escapeHtml(ev.calendarSummary)}</div>` : '';
     html += `<div class="cal-event-allday ${colorClasses[i % colorClasses.length]}">
+      ${calLine}
       <div class="cal-event-title">${escapeHtml(ev.title)}</div>
     </div>`;
   });
@@ -5496,10 +5568,12 @@ function renderAgenda() {
     const endStr = ev.end ? ev.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
     const location = ev.location ? `<span>📍 ${escapeHtml(ev.location)}</span>` : '';
     const duration = ev.end ? `<span>${timeStr} – ${endStr}</span>` : '';
+    const calLine = ev.calendarSummary ? `<div class="cal-event-cal">${escapeHtml(ev.calendarSummary)}</div>` : '';
 
     html += `<div class="cal-event ${colorClasses[(i + allDay.length) % colorClasses.length]}">
       <div class="cal-event-time">${timeStr}</div>
       <div class="cal-event-body">
+        ${calLine}
         <div class="cal-event-title">${escapeHtml(ev.title)}</div>
         <div class="cal-event-meta">${duration}${location}</div>
       </div>
@@ -5510,7 +5584,87 @@ function renderAgenda() {
   area.innerHTML = html;
 }
 
-// ── Fetch from Google Calendar API ──
+// ── Fetch from Google Calendar API (multi-calendar: primary + “Other calendars”) ──
+async function loadCalendarListOnce() {
+  if (!accessToken) throw new Error('no token');
+  if (calCalendarList !== null) return calCalendarList;
+  const r = await fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList?maxResults=250', {
+    headers: { Authorization: 'Bearer ' + accessToken }
+  });
+  if (!r.ok) throw new Error('calendarList ' + r.status);
+  const data = await r.json();
+  calCalendarList = data.items || [];
+  return calCalendarList;
+}
+
+function resolveCalendarIds(list) {
+  if (!list || !list.length) return ['primary'];
+  let enabled = null;
+  try {
+    const raw = localStorage.getItem('hp_calendar_enabled');
+    if (raw) enabled = JSON.parse(raw);
+  } catch (e) {}
+  if (!enabled || !Array.isArray(enabled)) {
+    return list.map(function (c) { return c.id; });
+  }
+  const valid = new Set(list.map(function (c) { return c.id; }));
+  const filtered = enabled.filter(function (id) { return valid.has(id); });
+  return filtered.length ? filtered : list.map(function (c) { return c.id; });
+}
+
+function renderCalSourcesList() {
+  const host = document.getElementById('cal-sources-list');
+  if (!host) return;
+  if (!calCalendarList || !calCalendarList.length) {
+    host.innerHTML = '<p class="wc-hint">No calendars returned. Check calendar scope when signing in.</p>';
+    return;
+  }
+  const enabled = new Set(resolveCalendarIds(calCalendarList));
+  host.innerHTML = calCalendarList.map(function (c, i) {
+    const checked = enabled.has(c.id) ? 'checked' : '';
+    const sum = escapeHtml(c.summary || c.id);
+    const primary = c.primary ? ' <span class="wc-hint">(primary)</span>' : '';
+    return '<label class="cal-source-row"><input type="checkbox" data-cal-idx="' + i + '" ' + checked + '><span>' + sum + '</span>' + primary + '</label>';
+  }).join('');
+}
+
+async function calToggleSourcesPanel() {
+  const p = document.getElementById('cal-sources-panel');
+  if (!p) return;
+  const willShow = p.style.display !== 'block';
+  p.style.display = willShow ? 'block' : 'none';
+  p.setAttribute('aria-hidden', willShow ? 'false' : 'true');
+  if (willShow && accessToken && !isDemo) {
+    try {
+      await loadCalendarListOnce();
+      renderCalSourcesList();
+    } catch (e) {
+      console.error(e);
+      const host = document.getElementById('cal-sources-list');
+      if (host) host.innerHTML = '<p class="wc-hint">Could not load calendar list. Re-sign in with calendar permission.</p>';
+    }
+  }
+}
+
+function calSourcesSelectAll(on) {
+  document.querySelectorAll('#cal-sources-list input[type="checkbox"]').forEach(function (cb) {
+    cb.checked = on;
+  });
+}
+
+function calApplySources() {
+  const boxes = document.querySelectorAll('#cal-sources-list input[type="checkbox"]');
+  const ids = [];
+  boxes.forEach(function (cb) {
+    if (cb.checked && calCalendarList && calCalendarList[parseInt(cb.getAttribute('data-cal-idx'), 10)]) {
+      ids.push(calCalendarList[parseInt(cb.getAttribute('data-cal-idx'), 10)].id);
+    }
+  });
+  localStorage.setItem('hp_calendar_enabled', JSON.stringify(ids));
+  loadCalendarEvents();
+  showToast(ids.length ? ('Showing ' + ids.length + ' calendar(s)') : 'No calendars selected — agenda may be empty');
+}
+
 async function loadCalendarEvents() {
   if (isDemo) { loadDemoCalendarEvents(); return; }
   if (!accessToken) return;
@@ -5521,19 +5675,43 @@ async function loadCalendarEvents() {
   const timeMax = new Date(year, month + 1, 0, 23, 59, 59).toISOString();
 
   try {
+    await loadCalendarListOnce();
+    const ids = resolveCalendarIds(calCalendarList);
+    const summaryById = {};
+    calCalendarList.forEach(function (c) {
+      summaryById[c.id] = c.summary || c.id;
+    });
+
     const params = new URLSearchParams({
       timeMin,
       timeMax,
       singleEvents: 'true',
       orderBy: 'startTime',
-      maxResults: '100',
+      maxResults: '250',
     });
-    const r = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?' + params, {
-      headers: { Authorization: 'Bearer ' + accessToken }
+    const headers = { Authorization: 'Bearer ' + accessToken };
+
+    const blocks = await Promise.all(ids.map(function (calId) {
+      const url = 'https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(calId) + '/events?' + params;
+      return fetch(url, { headers }).then(function (r) {
+        if (!r.ok) return { summary: summaryById[calId] || calId, items: [] };
+        return r.json().then(function (data) {
+          return { summary: summaryById[calId] || calId, items: data.items || [] };
+        });
+      }).catch(function () {
+        return { summary: summaryById[calId] || calId, items: [] };
+      });
+    }));
+
+    const merged = [];
+    blocks.forEach(function (block) {
+      block.items.forEach(function (item) {
+        const ev = parseCalEvent(item, block.summary);
+        if (ev) merged.push(ev);
+      });
     });
-    if (!r.ok) throw new Error('Calendar API error ' + r.status);
-    const data = await r.json();
-    calEvents = (data.items || []).map(parseCalEvent).filter(Boolean);
+    merged.sort(function (a, b) { return a.start - b.start; });
+    calEvents = merged;
     renderCalendar();
   } catch (e) {
     console.error('Calendar:', e);
@@ -5547,7 +5725,7 @@ async function loadCalendarEvents() {
   }
 }
 
-function parseCalEvent(item) {
+function parseCalEvent(item, calendarSummary) {
   if (item.status === 'cancelled') return null;
 
   const allDay = !!item.start?.date;
@@ -5577,6 +5755,7 @@ function parseCalEvent(item) {
     end,
     startDate,
     endDate,
+    calendarSummary: calendarSummary || '',
   };
 }
 
